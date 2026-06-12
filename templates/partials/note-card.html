@@ -1,0 +1,14 @@
+{{define "note_card"}}
+<article class="notes-item">
+  <div class="notes-item-header">
+    <h1 class="notes-item-title">
+      <a href="{{.URL}}" style="view-transition-name: {{.TitleTransitionName}};">{{.Title}}</a>
+    </h1>
+    <p class="notes-item-meta">
+      <time datetime="{{.Date}}">{{.Date}}</time>
+      <span>{{.ReadingTime}}</span>
+    </p>
+  </div>
+  {{with .Summary}}<p class="notes-item-summary">{{.}}</p>{{end}}
+</article>
+{{end}}

@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 type Renderer struct {
@@ -83,10 +84,12 @@ func (r Renderer) RenderNote(outputPath string, data NoteData) error {
 }
 
 func (r Renderer) render(outputPath, pageTemplate string, data any) error {
-	tmpl, err := template.ParseFiles(
-		filepath.Join(r.TemplatesDir, "base.html"),
-		filepath.Join(r.TemplatesDir, pageTemplate),
-	)
+	files, err := r.templateFiles(pageTemplate)
+	if err != nil {
+		return fmt.Errorf("解析模板: %w", err)
+	}
+
+	tmpl, err := template.ParseFiles(files...)
 	if err != nil {
 		return fmt.Errorf("解析模板: %w", err)
 	}
@@ -106,4 +109,20 @@ func (r Renderer) render(outputPath, pageTemplate string, data any) error {
 	}
 
 	return nil
+}
+
+func (r Renderer) templateFiles(pageTemplate string) ([]string, error) {
+	files := []string{
+		filepath.Join(r.TemplatesDir, "layouts", "base.html"),
+	}
+
+	partials, err := filepath.Glob(filepath.Join(r.TemplatesDir, "partials", "*.html"))
+	if err != nil {
+		return nil, fmt.Errorf("查找 partial 模板: %w", err)
+	}
+	sort.Strings(partials)
+	files = append(files, partials...)
+	files = append(files, filepath.Join(r.TemplatesDir, "pages", pageTemplate))
+
+	return files, nil
 }

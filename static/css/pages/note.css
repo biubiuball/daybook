@@ -1,0 +1,126 @@
+.note-detail-page {
+  align-items: start;
+}
+
+.note-detail {
+  margin-left: calc(var(--notes-content-width) - var(--note-body-width));
+  max-width: var(--note-body-width);
+  min-width: 0;
+  position: relative;
+  width: var(--note-body-width);
+}
+
+.note-toc {
+  color: var(--color-muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  opacity: 1;
+  position: absolute;
+  right: calc(100% + clamp(18px, 2.8vw, 34px));
+  top: var(--note-toc-top);
+  transform: translateY(0);
+  transition:
+    color 160ms ease,
+    opacity 240ms var(--ease-out),
+    transform 240ms var(--ease-out),
+    visibility 240ms ease;
+  visibility: visible;
+  width: var(--note-toc-width);
+}
+
+.note {
+  min-width: 0;
+  position: relative;
+}
+
+.note-back-link {
+  align-items: center;
+  border-radius: 999px;
+  color: var(--color-muted);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  left: -3rem;
+  position: absolute;
+  text-decoration: none;
+  top: 0.42rem;
+  transition: color 160ms ease;
+  width: 34px;
+}
+
+.note-back-link:hover,
+.note-back-link:focus-visible {
+  color: var(--color-accent);
+}
+
+.note-back-link:hover .material-symbol,
+.note-back-link:focus-visible .material-symbol {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.note-back-link:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.note-header {
+  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.note-title {
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--note-title-size);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.note-meta {
+  color: var(--color-muted);
+  display: inline-flex;
+  font-family: var(--font-meta);
+  font-size: clamp(0.95rem, 1.3vw, 1.12rem);
+  font-style: italic;
+  gap: 0.8rem;
+  line-height: 1;
+  margin: 1.2rem 0 0;
+  white-space: nowrap;
+}
+
+.note-summary {
+  color: var(--color-muted);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  margin: 1.25rem 0 0;
+  max-width: 42rem;
+}
+
+
+@media (max-width: 1600px) {
+  .note-toc {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(var(--note-toc-hide-y));
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 960px) {
+  .note-detail-page {
+    max-width: var(--note-body-width);
+  }
+
+  .note-detail {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .note-back-link {
+    margin-bottom: 1rem;
+    position: static;
+  }
+}
+}

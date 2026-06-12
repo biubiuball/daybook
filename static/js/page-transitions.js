@@ -170,21 +170,10 @@
     }
   }
 
-  function syncNoteToc(toc) {
-    var button = toc.querySelector(".note-toc-toggle");
-    var icon = button && button.querySelector(".material-symbol");
-    var isOpen = toc.classList.contains("is-open");
-
-    if (button) {
-      button.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }
-    if (icon) {
-      icon.textContent = "menu";
-    }
-  }
-
   function syncNoteTocs() {
-    document.querySelectorAll(".note-toc").forEach(syncNoteToc);
+    if (window.daybookSyncNoteTocs) {
+      window.daybookSyncNoteTocs();
+    }
   }
 
   function swapArticleStage(nextDocument) {
@@ -299,16 +288,6 @@
   }
 
   document.addEventListener("click", function (event) {
-    var tocToggle = event.target.closest(".note-toc-toggle");
-    if (tocToggle) {
-      var toc = tocToggle.closest(".note-toc");
-      if (toc) {
-        toc.classList.toggle("is-open");
-        syncNoteToc(toc);
-      }
-      return;
-    }
-
     var link = event.target.closest("a");
     if (!shouldHandleLink(link, event)) {
       return;

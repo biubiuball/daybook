@@ -4,7 +4,7 @@
 
 `daybook` 是一个使用 Go 编写的极简静态博客与 Obsidian 笔记发布工具。
 
-项目目标是将 `content/notes/` 目录中的 Markdown 笔记转换成 `public/` 目录中的静态网站。当前已经完成基础页面结构、文章列表、文章详情、persistent logo、side-nav、明暗主题和基础 Markdown 渲染。
+项目目标是将 `content/notes/` 目录中的 Markdown 笔记转换成 `public/` 目录中的静态网站。当前项目已经超过 MVP，已经完成基础页面结构、文章列表、文章详情、persistent logo、side-nav、明暗主题、页面切换动画和基础 Markdown 渲染。
 
 这个网站刻意保持简单。它没有后端、没有数据库、没有登录系统、没有评论、没有访问统计，也没有后台管理界面。
 
@@ -44,7 +44,7 @@ MVP 已完成，项目现在进入功能增强阶段。
 2. 解析 YAML frontmatter；
 3. 将 Markdown 正文转换成 HTML；
 4. 为每篇笔记生成一个 HTML 页面；
-5. 生成首页和文章列表页；
+5. 生成首页、文章列表页和文章详情页；
 6. 将 `static/` 中的文件复制到 `public/`；
 7. 提供本地预览服务器命令。
 
@@ -54,22 +54,36 @@ MVP 已完成，项目现在进入功能增强阶段。
 
 ```text
 daybook/
-├── cmd/
-│   └── daybook/
+├── cmd/daybook/
 ├── internal/
 │   ├── config/
 │   ├── content/
 │   ├── markdown/
 │   ├── render/
-│   └── site/
+│   ├── site/
+│   ├── obsidian/
+│   ├── graph/
+│   ├── search/
+│   └── feed/
 ├── content/
-│   └── notes/
+│   ├── notes/
+│   ├── pages/
+│   └── attachments/
 ├── templates/
+│   ├── layouts/
+│   ├── pages/
+│   └── partials/
 ├── static/
 │   ├── css/
+│   │   └── pages/
 │   ├── js/
 │   ├── fonts/
-│   └── images/
+│   ├── images/
+│   │   └── avatar/
+│   └── icons/
+│       └── social/
+├── scripts/
+├── docs/
 ├── public/
 ├── config.yaml
 ├── go.mod
@@ -80,46 +94,71 @@ daybook/
 
 `public/` 是构建产物。默认不要手动编辑 `public/`，也不要提交 `public/`，除非用户明确要求。
 
-## Go 代码风格
+## Go 代码分层
 
-* 尽可能使用 Go 标准库。
-* 保持 package 小而专注。
-* 使用清晰的命名。
-* 返回错误，而不是直接 panic。
-* 包装错误时使用 `fmt.Errorf("上下文: %w", err)`。
-* 修改 Go 文件后运行 `gofmt`。
-* 除非有明确理由，否则避免使用全局可变状态。
+* `cmd/daybook/` 只负责命令入口。
+* `internal/config/` 负责配置读取。
+* `internal/content/` 负责读取和解析内容文件。
+* `internal/markdown/` 负责 Markdown 到 HTML 的渲染。
+* `internal/render/` 负责 Go HTML 模板渲染。
+* `internal/site/` 负责站点构建流程。
+* `internal/obsidian/`、`internal/graph/`、`internal/search/`、`internal/feed/` 是未来功能边界，当前不要写无关实现。
+
+Go 代码应保持简单：
+
+* 尽可能使用 Go 标准库；
+* 保持 package 小而专注；
+* 返回错误，而不是直接 panic；
+* 包装错误时使用 `fmt.Errorf("上下文: %w", err)`；
+* 修改 Go 文件后运行 `gofmt`；
 * 早期版本中避免不必要的 interface。
-* 优先使用简单的 struct 和 function。
 
-## HTML 与模板风格
+## 模板分层
 
+* `templates/layouts/base.html` 是全局基础布局。
+* `templates/pages/` 放页面级模板。
+* `templates/partials/` 放可复用片段。
 * 使用 Go 的 `html/template`。
 * 保持模板简单、清晰、可读。
-* 不要引入前端框架。
-* 不要引入 Tailwind、React、Vue、Svelte、Astro 或任何打包工具。
-* CSS 使用普通 CSS，放在 `static/css/`。
-* JavaScript 使用原生 JavaScript，放在 `static/js/`。
-* 中英文字体使用 `static/fonts/maple/` 中的 Maple 字体。
+* 不要引入前端框架或模板打包工具。
+* 不要复制多个视觉不一致的 persistent logo。
+* 不要把 side-nav 和 persistent logo 混在一起。
+
+## CSS 分层
+
+`static/css/global.css` 是唯一入口，页面只应引用 `/css/global.css`。
+
+CSS 按职责拆分：
+
+* `tokens.css`：颜色、字体变量、尺寸变量、动画变量；
+* `fonts.css`：`@font-face`；
+* `base.css`：基础元素；
+* `layout.css`：全局布局、persistent logo、side-nav；
+* `components.css`：导航、按钮、tooltip、TOC 控件等组件；
+* `markdown.css`：文章正文 Markdown 样式；
+* `transitions.css`：页面切换、view transition、stagger 动画；
+* `pages/home.css`：首页；
+* `pages/notes.css`：文章列表页；
+* `pages/note.css`：文章详情页。
+
+修改正文样式时只作用于文章正文容器，例如 `.markdown` / `.post-content`，不要污染全站布局。
+
+## Static 资源规则
+
+* 字体保留在 `static/fonts/`。
+* 头像保留在 `static/images/avatar/`。
+* 社交 SVG 图标保留在 `static/icons/social/`。
+* 中英文字体优先使用 `static/fonts/maple/` 中的 Maple 字体。
 * 图标优先使用 `static/fonts/material-symbols/` 中的 Material Symbols。
-* 社交平台等图片图标可以使用 `static/images/` 中的 SVG 文件。
+* 不要使用 Google Fonts CDN 或其他外部 CDN。
+* 不要删除或压缩用户提供的图片、SVG、字体资源。
 
-## Protected Layout
+## Content 目录规则
 
-The persistent logo and side navigation are stable.
-
-除非用户明确要求，不要修改：
-
-* `.persistent-logo` 的位置、字体、字号、结构；
-* side-nav 的位置、头像、链接顺序；
-* side navigation layout；
-* side navigation avatar position；
-* side navigation link order；
-* persistent logo typography。
-
-`.persistent-logo` 必须在所有页面固定显示，并且不参与页面切换动画。修改页面切换动画、文章页布局或全局 CSS 时，必须确认 persistent logo 和 side-nav 没有被影响。
-
-## Markdown 与 Frontmatter
+* 文章 Markdown 放在 `content/notes/`。
+* `content/pages/` 预留给 about 等独立页面，当前不要实现页面渲染。
+* `content/attachments/` 预留给 Obsidian 附件、图片、PDF，当前不要实现附件处理。
+* 不要删除 `content/notes/` 中的用户内容。
 
 Markdown 笔记格式如下：
 
@@ -158,14 +197,31 @@ draft: false
 * 不要把 Obsidian 双链、嵌入、callout 混进标准 Markdown 修复中。
 * Obsidian 兼容功能必须分阶段实现。
 * 修改 Markdown 渲染器后必须更新或新增测试。
-* 修改正文样式时只作用于文章正文容器，例如 `.markdown` / `.post-content`，不要污染全站布局。
 * 默认不要允许 Markdown 中的任意 HTML 直接注入危险内容。
+
+## Protected Layout
+
+The persistent logo and side navigation are stable.
+
+除非用户明确要求，不要修改：
+
+* `.persistent-logo` 的位置、字体、字号、结构；
+* side-nav 的位置、头像、链接顺序；
+* side navigation layout；
+* side navigation avatar position；
+* side navigation link order；
+* persistent logo typography。
+
+`.persistent-logo` 必须在所有页面固定显示，并且不参与页面切换动画。修改页面切换动画、文章页布局或全局 CSS 时，必须确认 persistent logo 和 side-nav 没有被影响。
 
 ## 命令
 
 ```bash
 go run ./cmd/daybook build
 go run ./cmd/daybook serve
+scripts/check.sh
+scripts/build.sh
+scripts/clean.sh
 ```
 
 `build` 负责生成 `public/`。`serve` 负责在 `http://localhost:1313` 预览 `public/`。
@@ -209,7 +265,7 @@ go run ./cmd/daybook serve
 * 如何测试；
 * 下一步建议做什么。
 
-除非明确要求，否则不要重写整个项目。不要在没有解释原因的情况下添加大型依赖。不要删除 `content/notes/` 中的用户内容。
+除非明确要求，否则不要重写整个项目。不要在没有解释原因的情况下添加大型依赖。不要一次实现多个未来功能。
 
 ## 未来功能
 

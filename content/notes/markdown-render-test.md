@@ -88,7 +88,7 @@ go run ./cmd/daybook build
 
 这是一张本地图片：
 
-![史帙头像](/images/shelby.jpg)
+![史帙头像](/images/avatar/shelby.jpg)
 
 ---
 

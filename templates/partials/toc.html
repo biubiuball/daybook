@@ -1,0 +1,21 @@
+{{define "toc"}}
+{{if .Note.Headings}}
+<aside class="note-toc is-open" data-note-toc aria-label="文章目录">
+  <div class="note-toc-header">
+    <button class="note-toc-toggle" type="button" aria-expanded="true" aria-controls="note-toc-list" aria-label="展开或收起文章目录">
+      <span class="material-symbol" aria-hidden="true">menu</span>
+    </button>
+    <span class="note-toc-title">目录</span>
+  </div>
+  <nav class="note-toc-panel" id="note-toc-list" aria-label="文章目录">
+    <ol>
+      {{range .Note.Headings}}
+      <li class="note-toc-depth-{{.Level}}">
+        <a href="#{{.ID}}">{{.Text}}</a>
+      </li>
+      {{end}}
+    </ol>
+  </nav>
+</aside>
+{{end}}
+{{end}}

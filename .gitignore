@@ -1,24 +1,20 @@
-/public/cat > .gitignore <<'EOF'
 # Build output
 /public/
 /daybook
 
-# Pagefind or search index, if used later
+# Future search output
 /.pagefind/
 
 # Temporary files
 *.tmp
 *.log
 .DS_Store
+Thumbs.db
 
-# Editor
+# Editors
 .vscode/
 .idea/
 
-# OS / cache
-Thumbs.db
-
-# Optional: Obsidian workspace state
+# Obsidian workspace state
 content/.obsidian/workspace.json
 content/.obsidian/workspace-mobile.json
-EOF

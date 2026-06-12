@@ -1,8 +1,8 @@
 # Daybook
 
-Daybook 是一个使用 Go 编写的极简静态博客生成器，用于把 `content/notes/` 中的 Markdown 笔记发布成静态网站。
+Daybook 是一个使用 Go 编写的极简静态博客与 Obsidian 笔记发布工具，用于把 `content/notes/` 中的 Markdown 笔记发布成静态网站。
 
-当前版本只实现 MVP：读取笔记、解析 YAML frontmatter、转换 Markdown、生成静态页面，并提供本地预览服务。
+当前版本已经完成首页、文章列表页、文章详情页、明暗主题、页面切换动画和基础 Markdown/GFM 渲染。
 
 ## 笔记格式
 
@@ -63,6 +63,14 @@ go run ./cmd/daybook serve
 http://localhost:1313
 ```
 
+## 辅助脚本
+
+```bash
+scripts/check.sh
+scripts/build.sh
+scripts/clean.sh
+```
+
 ## 当前不包含
 
-当前 MVP 还没有实现标签页、归档页、双链、反链、关系图谱、RSS、sitemap 和搜索。
+当前还没有实现 Obsidian 双链、嵌入笔记、callout、反链、关系图谱、标签页、归档页、RSS、sitemap 和搜索。

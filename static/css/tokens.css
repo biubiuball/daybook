@@ -1,0 +1,101 @@
+:root {
+  --font-logo: "Fraunces", serif;
+  --font-ui: "Maple Mono", monospace;
+  --font-icon: "Material Symbols Rounded";
+  --font-meta: "Playfair Display", serif;
+  --font-signature-cn: "Zhi Mang Xing", cursive;
+  --font-signature-en: "Allura", cursive;
+  --side-rail-width: 220px;
+  --persistent-logo-left: 40px;
+  --persistent-logo-top: 23px;
+  --side-rail-top: calc(var(--persistent-logo-top) + 4.5rem);
+  --hero-avatar-size: clamp(190px, 22vw, 260px);
+  --hero-avatar-size-mobile: clamp(148px, 44vw, 178px);
+  --home-hero-top: clamp(8rem, 20vh, 13rem);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-page: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --article-enter-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --duration-fast: 240ms;
+  --duration-normal: 420ms;
+  --duration-shared: 720ms;
+  --duration-article-enter: 500ms;
+  --post-enter-duration: 500ms;
+  --post-enter-y: 2rem;
+  --post-stagger-step: 45ms;
+  --transition-exit-delay: 320ms;
+  --transition-cleanup-delay: 1120ms;
+  --notes-content-width: 680px;
+  --notes-aside-width: 300px;
+  --notes-page-gap: clamp(72px, 9vw, 132px);
+  --note-body-width: 44rem;
+  --note-toc-width: clamp(11rem, 14vw, 13rem);
+  --note-toc-top: clamp(2.25rem, 5vh, 4rem);
+  --note-toc-hide-y: 1.75rem;
+  --toc-collapse-duration: 280ms;
+  --note-title-size: clamp(2.05rem, 3vw, 2.35rem);
+  --note-text-size: 1rem;
+  --color-page: #fbfaf7;
+  --color-text: #26231f;
+  --color-muted: #756f66;
+  --color-line: #e7e0d8;
+  --color-accent: #111111;
+  --color-tooltip-bg: #26231f;
+  --color-tooltip-text: #fbfaf7;
+  --color-code-bg: #f3f0ea;
+  --color-code-border: #e1d8ce;
+  --color-code-inline-bg: #eee8df;
+  --shadow-code: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --syntax-text: #2f2a24;
+  --syntax-comment: #8a8176;
+  --syntax-keyword: #7a4f9a;
+  --syntax-string: #8a5b20;
+  --syntax-number: #8b4f30;
+  --syntax-function: #2f6f73;
+  --syntax-tag: #8f4b45;
+  --syntax-attr: #6a6430;
+  --syntax-operator: #6b6258;
+  --syntax-error: #a64242;
+  --syntax-inserted: #3f7a4f;
+  --syntax-deleted: #a64242;
+  --image-icon-filter: none;
+  --shadow-avatar:
+    0 18px 48px rgba(38, 35, 31, 0.14),
+    0 4px 16px rgba(38, 35, 31, 0.08);
+  --shadow-avatar-small:
+    0 10px 28px rgba(38, 35, 31, 0.12),
+    0 3px 10px rgba(38, 35, 31, 0.08);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --color-page: #1f1d1a;
+  --color-text: #e8e0d6;
+  --color-muted: #ada397;
+  --color-line: #39342f;
+  --color-accent: #fff4e6;
+  --color-tooltip-bg: #e8e0d6;
+  --color-tooltip-text: #1f1d1a;
+  --color-code-bg: #27231f;
+  --color-code-border: #413a33;
+  --color-code-inline-bg: #312b25;
+  --shadow-code: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --syntax-text: #e8e0d6;
+  --syntax-comment: #9f9488;
+  --syntax-keyword: #d8a4f4;
+  --syntax-string: #e4bf7a;
+  --syntax-number: #e2a47d;
+  --syntax-function: #91d0d2;
+  --syntax-tag: #eda3a0;
+  --syntax-attr: #d6ce86;
+  --syntax-operator: #c8bfb4;
+  --syntax-error: #ff8f8f;
+  --syntax-inserted: #9ad6a7;
+  --syntax-deleted: #ff8f8f;
+  --image-icon-filter: invert(94%) sepia(8%) saturate(530%) hue-rotate(333deg) brightness(96%) contrast(88%);
+  --shadow-avatar:
+    0 18px 48px rgba(0, 0, 0, 0.32),
+    0 4px 16px rgba(0, 0, 0, 0.22);
+  --shadow-avatar-small:
+    0 10px 28px rgba(0, 0, 0, 0.28),
+    0 3px 10px rgba(0, 0, 0, 0.18);
+  color-scheme: dark;
+}

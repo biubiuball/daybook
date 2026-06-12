@@ -1,0 +1,27 @@
+{{define "base"}}
+<!doctype html>
+<html lang="zh-CN">
+{{template "head" .}}
+<body class="{{.BodyClass}}">
+  {{template "persistent_logo" .}}
+
+  <div class="page-frame">
+  {{if eq .PageTitle "首页"}}
+  {{template "header_nav" .}}
+
+  <main class="site-main{{if eq .PageTitle "首页"}} home-main{{end}}">
+    {{template "content" .}}
+  </main>
+  {{else}}
+  <div class="page-shell">
+    {{template "side_nav" .}}
+
+    <main class="site-main page-main">
+      {{template "content" .}}
+    </main>
+  </div>
+  {{end}}
+  </div>
+</body>
+</html>
+{{end}}

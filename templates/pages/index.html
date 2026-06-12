@@ -1,0 +1,22 @@
+{{define "content"}}
+<section class="home-hero" aria-label="个人介绍">
+  <div class="hero-avatar-wrap">
+    <img class="hero-avatar" src="/images/avatar/shelby.jpg" alt="史帙头像">
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-identity">
+      <h1 class="hero-name">
+        <span class="hero-name-cn">史帙</span>
+        <span class="hero-name-en">Stat.Indet</span>
+      </h1>
+
+      <p class="hero-slogan">笑一个吧，功成名就不是目的。</p>
+    </div>
+
+    {{template "social_links" .}}
+  </div>
+</section>
+
+{{template "home_footer" .}}
+{{end}}
