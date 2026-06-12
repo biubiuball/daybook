@@ -61,7 +61,9 @@ func TestToHTMLWithHighlightedCode(t *testing.T) {
 	}
 
 	wantParts := []string{
-		`<div class="highlight"><pre tabindex="0" class="chroma">`,
+		`<div class="highlight"><button class="code-copy-button" type="button" aria-label="复制代码">`,
+		`<span class="material-symbol" aria-hidden="true">content_copy</span>`,
+		`<pre tabindex="0" class="chroma">`,
 		`<code>`,
 		`class="kd"`,
 		`class="nf"`,
@@ -80,7 +82,9 @@ func TestToHTMLWithPlainCodeFallback(t *testing.T) {
 	}
 
 	wantParts := []string{
-		`<div class="highlight is-plain"><pre tabindex="0"><code class="language-moo" data-lang="moo">`,
+		`<div class="highlight is-plain"><button class="code-copy-button" type="button" aria-label="复制代码">`,
+		`<span class="material-symbol" aria-hidden="true">content_copy</span>`,
+		`<pre tabindex="0"><code class="language-moo" data-lang="moo">`,
 		`plain &lt;code&gt; &amp; text`,
 		`</code></pre></div>`,
 	}
@@ -100,7 +104,7 @@ func TestToHTMLWithNoLanguageCodeFallback(t *testing.T) {
 		t.Fatalf("ToHTMLWithHeadings returned error: %v", err)
 	}
 
-	if !strings.Contains(document.HTML, `<div class="highlight is-plain"><pre tabindex="0"><code>plain text`) {
+	if !strings.Contains(document.HTML, `<pre tabindex="0"><code>plain text`) {
 		t.Fatalf("HTML does not contain highlighted code classes: %s", document.HTML)
 	}
 }

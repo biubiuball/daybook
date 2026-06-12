@@ -1,6 +1,7 @@
 (function () {
   var isNavigating = false;
   var currentPageKey = pageKey(window.location.href);
+  var cleanupTimer = 0;
 
   if ("scrollRestoration" in history) {
     history.scrollRestoration = "manual";
@@ -116,12 +117,33 @@
     return "page-entering";
   }
 
+  function cancelCleanupTimer() {
+    if (!cleanupTimer) {
+      return;
+    }
+    window.clearTimeout(cleanupTimer);
+    cleanupTimer = 0;
+  }
+
   function clearTransitionClasses() {
     document.documentElement.classList.remove("is-transitioning", "article-transition");
     if (!document.body) {
       return;
     }
     document.body.classList.remove("home-exiting", "page-exiting", "home-entering", "page-entering");
+  }
+
+  function scheduleClearTransitionClasses(delay) {
+    cancelCleanupTimer();
+    if (delay <= 0) {
+      clearTransitionClasses();
+      return;
+    }
+
+    cleanupTimer = window.setTimeout(function () {
+      cleanupTimer = 0;
+      clearTransitionClasses();
+    }, delay);
   }
 
   async function fetchPage(url) {
@@ -212,6 +234,7 @@
   async function runSwap(nextDocument, url, updateHistory) {
     var useMotion = !reducedMotion();
     var articleTransition = isArticleTransition(url);
+    cancelCleanupTimer();
     clearTransitionClasses();
 
     if (useMotion) {
@@ -237,9 +260,14 @@
       swapPage(nextDocument, url, updateHistory, articleTransition);
     }
 
+    if (articleTransition) {
+      clearTransitionClasses();
+      return;
+    }
+
     document.documentElement.classList.remove("is-transitioning");
     document.body.classList.remove("home-exiting", "page-exiting");
-    window.setTimeout(clearTransitionClasses, useMotion ? cssDuration("--transition-cleanup-delay", 900) : 0);
+    scheduleClearTransitionClasses(useMotion ? cssDuration("--transition-cleanup-delay", 900) : 0);
   }
 
   async function navigateTo(url, updateHistory) {
@@ -299,6 +327,7 @@
   });
 
   window.addEventListener("pageshow", function () {
+    cancelCleanupTimer();
     clearTransitionClasses();
     currentPageKey = pageKey(window.location.href);
     syncThemeButtons();

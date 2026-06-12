@@ -140,10 +140,13 @@ func renderCodeBlockWrapper(w util.BufWriter, context highlighting.CodeBlockCont
 	if entering {
 		if context.Highlighted() {
 			_, _ = w.WriteString(`<div class="highlight">`)
+			writeCopyButton(w)
 			return
 		}
 
-		_, _ = w.WriteString(`<div class="highlight is-plain"><pre tabindex="0"><code`)
+		_, _ = w.WriteString(`<div class="highlight is-plain">`)
+		writeCopyButton(w)
+		_, _ = w.WriteString(`<pre tabindex="0"><code`)
 		if language, ok := context.Language(); ok && len(language) > 0 {
 			escapedLanguage := stdhtml.EscapeString(string(language))
 			_, _ = w.WriteString(` class="language-`)
@@ -162,4 +165,10 @@ func renderCodeBlockWrapper(w util.BufWriter, context highlighting.CodeBlockCont
 	}
 
 	_, _ = w.WriteString(`</code></pre></div>`)
+}
+
+func writeCopyButton(w util.BufWriter) {
+	_, _ = w.WriteString(`<button class="code-copy-button" type="button" aria-label="复制代码">`)
+	_, _ = w.WriteString(`<span class="material-symbol" aria-hidden="true">content_copy</span>`)
+	_, _ = w.WriteString(`</button>`)
 }

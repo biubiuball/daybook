@@ -67,10 +67,6 @@
   color-scheme: light;
 }
 
-@view-transition {
-  navigation: auto;
-}
-
 ::view-transition {
   background: var(--color-page);
 }
@@ -521,8 +517,7 @@ a {
 
 .notes-item-title a:hover,
 .notes-item-title a:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  color: var(--color-accent);
 }
 
 .notes-item-meta {
@@ -1010,20 +1005,24 @@ a {
 .markdown input[type="checkbox"] {
   accent-color: var(--color-accent);
   cursor: default;
-  flex: 0 0 auto;
   height: 0.95rem;
-  margin: 0.25rem 0 0;
+  margin: 0;
   opacity: 1;
   vertical-align: middle;
   width: 0.95rem;
 }
 
 .markdown li:has(> input[type="checkbox"]) {
-  align-items: flex-start;
-  display: flex;
-  gap: 0.55rem;
   list-style: none;
   margin-left: -1.45rem;
+  padding-left: 1.45rem;
+  position: relative;
+}
+
+.markdown li:has(> input[type="checkbox"]) > input[type="checkbox"] {
+  left: 0;
+  position: absolute;
+  top: 0.48em;
 }
 
 .markdown blockquote {
@@ -1129,6 +1128,7 @@ a {
   border-radius: 6px;
   box-shadow: var(--shadow-code);
   overflow-x: auto;
+  position: relative;
 }
 
 .markdown .highlight pre {
@@ -1137,6 +1137,7 @@ a {
   border-radius: 0;
   box-shadow: none;
   margin: 0;
+  padding-right: 3.25rem;
 }
 
 .markdown pre.chroma {
@@ -1146,6 +1147,52 @@ a {
 
 .markdown .highlight.is-plain pre {
   color: var(--syntax-text);
+}
+
+.code-copy-button {
+  align-items: center;
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-code-border);
+  border-radius: 999px;
+  color: var(--color-muted);
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 0.7rem;
+  top: 0.7rem;
+  transition:
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    opacity 160ms var(--ease-out);
+  width: 2rem;
+  z-index: 1;
+}
+
+.code-copy-button .material-symbol {
+  font-size: 1.15rem;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  transition: font-variation-settings 160ms var(--ease-out);
+}
+
+.code-copy-button:hover,
+.code-copy-button:focus-visible,
+.code-copy-button.is-copied {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.code-copy-button:hover .material-symbol,
+.code-copy-button:focus-visible .material-symbol,
+.code-copy-button.is-copied .material-symbol {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.code-copy-button:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
 .markdown .chroma .line {
