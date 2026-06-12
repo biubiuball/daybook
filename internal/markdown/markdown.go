@@ -3,6 +3,7 @@ package markdown
 import (
 	"bytes"
 	"fmt"
+	stdhtml "html"
 	"strings"
 
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
@@ -12,6 +13,7 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	gmtext "github.com/yuin/goldmark/text"
+	"github.com/yuin/goldmark/util"
 )
 
 type Heading struct {
@@ -38,11 +40,18 @@ func ToHTMLWithHeadings(input string) (Document, error) {
 	source := []byte(input)
 	markdown := goldmark.New(
 		goldmark.WithExtensions(
-			extension.GFM,
+			extension.Table,
+			extension.Strikethrough,
+			extension.Linkify,
+			extension.TaskList,
 			extension.Footnote,
 			highlighting.NewHighlighting(
 				highlighting.WithStyle("github"),
-				highlighting.WithFormatOptions(chromahtml.WithClasses(true)),
+				highlighting.WithFormatOptions(
+					chromahtml.WithClasses(true),
+					chromahtml.WithPreWrapper(codeBlockPreWrapper{}),
+				),
+				highlighting.WithWrapperRenderer(renderCodeBlockWrapper),
 			),
 		),
 		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
@@ -107,4 +116,50 @@ func headingID(heading *ast.Heading) string {
 	default:
 		return fmt.Sprint(id)
 	}
+}
+
+type codeBlockPreWrapper struct{}
+
+func (codeBlockPreWrapper) Start(code bool, _ string) string {
+	if code {
+		return `<pre tabindex="0" class="chroma"><code>`
+	}
+
+	return `<pre tabindex="0">`
+}
+
+func (codeBlockPreWrapper) End(code bool) string {
+	if code {
+		return `</code></pre>`
+	}
+
+	return `</pre>`
+}
+
+func renderCodeBlockWrapper(w util.BufWriter, context highlighting.CodeBlockContext, entering bool) {
+	if entering {
+		if context.Highlighted() {
+			_, _ = w.WriteString(`<div class="highlight">`)
+			return
+		}
+
+		_, _ = w.WriteString(`<div class="highlight is-plain"><pre tabindex="0"><code`)
+		if language, ok := context.Language(); ok && len(language) > 0 {
+			escapedLanguage := stdhtml.EscapeString(string(language))
+			_, _ = w.WriteString(` class="language-`)
+			_, _ = w.WriteString(escapedLanguage)
+			_, _ = w.WriteString(`" data-lang="`)
+			_, _ = w.WriteString(escapedLanguage)
+			_, _ = w.WriteString(`"`)
+		}
+		_, _ = w.WriteString(`>`)
+		return
+	}
+
+	if context.Highlighted() {
+		_, _ = w.WriteString(`</div>`)
+		return
+	}
+
+	_, _ = w.WriteString(`</code></pre></div>`)
 }

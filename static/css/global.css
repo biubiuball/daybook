@@ -1009,13 +1009,19 @@ a {
 
 .markdown input[type="checkbox"] {
   accent-color: var(--color-accent);
+  cursor: default;
+  flex: 0 0 auto;
   height: 0.95rem;
-  margin: 0 0.5rem 0.12rem 0;
+  margin: 0.25rem 0 0;
+  opacity: 1;
   vertical-align: middle;
   width: 0.95rem;
 }
 
 .markdown li:has(> input[type="checkbox"]) {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.55rem;
   list-style: none;
   margin-left: -1.45rem;
 }
@@ -1121,17 +1127,25 @@ a {
 .markdown .highlight {
   border: 1px solid var(--color-code-border);
   border-radius: 6px;
+  box-shadow: var(--shadow-code);
   overflow-x: auto;
 }
 
 .markdown .highlight pre {
+  background: transparent;
   border: 0;
+  border-radius: 0;
+  box-shadow: none;
   margin: 0;
 }
 
 .markdown pre.chroma {
-  border: 1px solid var(--color-code-border);
+  border: 0;
   margin: 0;
+}
+
+.markdown .highlight.is-plain pre {
+  color: var(--syntax-text);
 }
 
 .markdown .chroma .line {

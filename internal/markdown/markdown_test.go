@@ -23,14 +23,15 @@ func TestToHTMLWithHeadings(t *testing.T) {
 }
 
 func TestToHTMLWithGFM(t *testing.T) {
-	document, err := ToHTMLWithHeadings("~~old~~\n\n- [x] done\n\n| A | B |\n| --- | --- |\n| **strong** | ~~deleted~~ |\n")
+	document, err := ToHTMLWithHeadings("~~old~~\n\n- [x] done\n- [ ] todo\n\n| A | B |\n| --- | --- |\n| **strong** | ~~deleted~~ |\n")
 	if err != nil {
 		t.Fatalf("ToHTMLWithHeadings returned error: %v", err)
 	}
 
 	wantParts := []string{
 		"<del>old</del>",
-		`type="checkbox"`,
+		`<input checked="" disabled="" type="checkbox"> done`,
+		`<input disabled="" type="checkbox"> todo`,
 		"<table>",
 		"<strong>strong</strong>",
 		"<del>deleted</del>",
@@ -59,7 +60,47 @@ func TestToHTMLWithHighlightedCode(t *testing.T) {
 		t.Fatalf("ToHTMLWithHeadings returned error: %v", err)
 	}
 
-	if !strings.Contains(document.HTML, `class="chroma`) || !strings.Contains(document.HTML, `class="kd"`) {
+	wantParts := []string{
+		`<div class="highlight"><pre tabindex="0" class="chroma">`,
+		`<code>`,
+		`class="kd"`,
+		`class="nf"`,
+	}
+	for _, part := range wantParts {
+		if !strings.Contains(document.HTML, part) {
+			t.Fatalf("HTML does not contain %q: %s", part, document.HTML)
+		}
+	}
+}
+
+func TestToHTMLWithPlainCodeFallback(t *testing.T) {
+	document, err := ToHTMLWithHeadings("```moo\nplain <code> & text\n```\n")
+	if err != nil {
+		t.Fatalf("ToHTMLWithHeadings returned error: %v", err)
+	}
+
+	wantParts := []string{
+		`<div class="highlight is-plain"><pre tabindex="0"><code class="language-moo" data-lang="moo">`,
+		`plain &lt;code&gt; &amp; text`,
+		`</code></pre></div>`,
+	}
+	for _, part := range wantParts {
+		if !strings.Contains(document.HTML, part) {
+			t.Fatalf("HTML does not contain %q: %s", part, document.HTML)
+		}
+	}
+	if strings.Contains(document.HTML, "<code> & text") {
+		t.Fatalf("HTML did not escape plain code fallback: %s", document.HTML)
+	}
+}
+
+func TestToHTMLWithNoLanguageCodeFallback(t *testing.T) {
+	document, err := ToHTMLWithHeadings("```\nplain text\n```\n")
+	if err != nil {
+		t.Fatalf("ToHTMLWithHeadings returned error: %v", err)
+	}
+
+	if !strings.Contains(document.HTML, `<div class="highlight is-plain"><pre tabindex="0"><code>plain text`) {
 		t.Fatalf("HTML does not contain highlighted code classes: %s", document.HTML)
 	}
 }
