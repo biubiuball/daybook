@@ -1,19 +1,160 @@
 {{define "golden_spiral"}}
-<div class="golden-spiral" aria-hidden="true">
+<div class="golden-spiral"
+  data-outer-rect="{{.Spiral.OuterRect}}"
+  data-outer-left-top="{{.Spiral.OuterRectLeftTop}}"
+  data-outer-right-bottom="{{.Spiral.OuterRectRightBottom}}"
+  data-spiral-outer-corner="{{.Spiral.SpiralOuterCorner}}"
+  data-spiral-start="{{.Spiral.SpiralVisualStart}}"
+  data-spiral-end="{{.Spiral.SpiralVisualEnd}}"
+  data-spin-center="{{.Spiral.SpinCenterX}} {{.Spiral.SpinCenterY}}"
+  data-spiral-quarters="{{.Spiral.SpiralOuterQuarterTurns}}..{{.Spiral.SpiralInnerQuarterTurns}}"
+  aria-hidden="true">
+  <style>
+    @keyframes golden-curve-life {
+      0%,
+      {{.Spiral.CurveStartPct}}% {
+        opacity: 0;
+        stroke-dashoffset: var(--golden-curve-dash-length);
+      }
+
+      {{.Spiral.CurveFadePct}}% {
+        opacity: 1;
+        stroke-dashoffset: var(--golden-curve-dash-length);
+      }
+
+      {{.Spiral.CurveGrowEndPct}}%,
+      {{.Spiral.CurveShrinkStartPct}}% {
+        opacity: 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.Spiral.CurveShrinkEndPct}}% {
+        opacity: 1;
+        stroke-dashoffset: var(--golden-curve-dash-length);
+      }
+
+      {{.Spiral.CurveHidePct}}%,
+      100% {
+        opacity: 0;
+        stroke-dashoffset: var(--golden-curve-dash-length);
+      }
+    }
+
+    {{range .Spiral.Diagonals}}
+    @keyframes golden-guide-life-{{.Order}} {
+      0%,
+      {{.GrowStartPct}}% {
+        opacity: 0;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.GrowFadePct}}% {
+        opacity: 1;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.GrowEndPct}}%,
+      {{.ShrinkStartPct}}% {
+        opacity: 1;
+        stroke-dasharray: 1 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.ShrinkEndPct}}% {
+        opacity: 1;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.HidePct}}%,
+      100% {
+        opacity: 0;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+    }
+    {{end}}
+
+    {{range .Spiral.Squares}}
+    @keyframes golden-guide-life-{{.Order}} {
+      0%,
+      {{.GrowStartPct}}% {
+        opacity: 0;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.GrowFadePct}}% {
+        opacity: 1;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.GrowEndPct}}%,
+      {{.ShrinkStartPct}}% {
+        opacity: 1;
+        stroke-dasharray: 1 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.ShrinkEndPct}}% {
+        opacity: 1;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+
+      {{.HidePct}}%,
+      100% {
+        opacity: 0;
+        stroke-dasharray: 0 1;
+        stroke-dashoffset: 0;
+      }
+    }
+    {{end}}
+  </style>
+
   <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <g class="golden-spiral-stage" style="transform-origin: {{.Spiral.PoleX}}px {{.Spiral.PoleY}}px">
+    <g class="golden-spiral-stage" style="--golden-loop-duration: {{.Spiral.LoopDuration}}">
+      <animateTransform class="golden-spin-motion" attributeName="transform" type="rotate" from="0 {{.Spiral.SpinCenterX}} {{.Spiral.SpinCenterY}}" to="360 {{.Spiral.SpinCenterX}} {{.Spiral.SpinCenterY}}" dur="{{.Spiral.SpinDuration}}" repeatCount="indefinite"></animateTransform>
       {{range .Spiral.Layers}}
       <g class="golden-spiral-layer golden-spiral-layer-{{.Index}}">
         {{range $.Spiral.Diagonals}}
-        <path class="golden-diagonal" d="{{.D}}" pathLength="1" vector-effect="non-scaling-stroke" style="--golden-offset: {{.Offset}}; --golden-span: {{.Span}}"></path>
+        <path class="golden-diagonal" d="{{.D}}" pathLength="1" vector-effect="non-scaling-stroke" style="animation-name: golden-guide-life-{{.Order}}; --golden-grow-delay: {{.GrowDelay}}; --golden-shrink-delay: {{.ShrinkDelay}}"></path>
         {{end}}
         {{range $.Spiral.Squares}}
-        <path class="golden-rect" d="{{.D}}" pathLength="1" vector-effect="non-scaling-stroke" style="--golden-offset: {{.Offset}}; --golden-span: {{.Span}}"></path>
+        <path class="golden-rect" d="{{.D}}" pathLength="1" vector-effect="non-scaling-stroke" style="animation-name: golden-guide-life-{{.Order}}; --golden-grow-delay: {{.GrowDelay}}; --golden-shrink-delay: {{.ShrinkDelay}}"></path>
         {{end}}
-        <path class="golden-curve" d="{{$.Spiral.SpiralPath}}" pathLength="1" vector-effect="non-scaling-stroke"></path>
+        <path class="golden-curve" d="{{$.Spiral.SpiralPath}}" vector-effect="non-scaling-stroke"></path>
       </g>
       {{end}}
     </g>
   </svg>
+  <script>
+    (function () {
+      var spiral = document.currentScript.closest(".golden-spiral");
+      if (!spiral) {
+        return;
+      }
+
+      function updateCurveDash() {
+        var curves = spiral.querySelectorAll(".golden-curve");
+        curves.forEach(function (curve) {
+          var matrix = curve.getScreenCTM();
+          if (!matrix) {
+            return;
+          }
+
+          var scale = Math.hypot(matrix.a, matrix.b) || 1;
+          var dashLength = curve.getTotalLength() * scale + 2;
+          curve.style.setProperty("--golden-curve-dash-length", dashLength.toFixed(2));
+        });
+      }
+
+      updateCurveDash();
+      window.addEventListener("resize", updateCurveDash);
+    })();
+  </script>
 </div>
 {{end}}
