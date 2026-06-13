@@ -165,17 +165,24 @@ func (r Renderer) RenderAbout(outputPath string, data AboutData) error {
 
 func NewGoldenSpiral() GoldenSpiral {
 	phi := (1 + math.Sqrt(5)) / 2
-	const quarter = math.Pi / 2
 	const hiddenDuration = 0.61803398875
 	const maxSquares = 13
 
-	outerRect := goldenRect{
+	baseOuterRect := goldenRect{
 		x: 560,
 		y: 140,
 		w: 1080,
 		h: 1080 / phi,
 	}
+	baseSquares, basePole := subdivideGoldenRect(baseOuterRect, maxSquares)
+	if len(baseSquares) == 0 {
+		return GoldenSpiral{}
+	}
 
+	baseOuterAnchor := point{x: baseOuterRect.x, y: baseOuterRect.y + baseOuterRect.h}
+	_, visualAnchor, _ := buildSpiralPath(basePole, baseOuterAnchor, float64(len(baseSquares)), 0, math.Pi/180)
+
+	outerRect := scaleRectAround(baseOuterRect, visualAnchor, phi)
 	squares, pole := subdivideGoldenRect(outerRect, maxSquares)
 
 	if len(squares) == 0 {
@@ -210,27 +217,33 @@ func NewGoldenSpiral() GoldenSpiral {
 	guideGrowEnd := 5 * phi
 	curveGrowDuration := 7 * phi
 	curveGrowEnd := curveGrowStart + curveGrowDuration
-	holdStart := curveGrowEnd
-	curveShrinkStart := holdStart + phi
-	guideShrinkStart := curveShrinkStart + phi
-	curveShrinkDuration := curveGrowDuration
-	hiddenStart := curveShrinkStart + curveShrinkDuration
-	loopDuration := hiddenStart + hiddenDuration
-	hideAt := hiddenStart + 0.12
+	curveShrinkStart := curveGrowEnd + phi
+
+	// 收缩顺序：螺旋曲线先收缩到起点，随后辅助线条收缩并消失。
+	curveShrinkDuration := curveGrowDuration / phi
+	curveShrinkEnd := curveShrinkStart + curveShrinkDuration
+	curveHideAt := curveShrinkEnd + 0.12
+
+	guideShrinkStart := curveShrinkEnd
+	guideShrinkEnd := guideShrinkStart + guideGrowEnd/phi
+	guideHideAt := guideShrinkEnd + 0.12
+
+	loopDuration := guideHideAt + hiddenDuration
 
 	diagonals := make([]GoldenPath, 0, len(diagonalDrafts))
 	for i, draft := range diagonalDrafts {
-		diagonals = append(diagonals, goldenPathFromDraft(i, draft, minDistance, maxDistance, phi, guideGrowEnd, guideShrinkStart, hiddenStart, hideAt, loopDuration))
+		diagonals = append(diagonals, goldenPathFromDraft(i, draft, minDistance, maxDistance, phi, guideGrowEnd, guideShrinkStart, guideShrinkEnd, guideHideAt, loopDuration))
 	}
 
 	squarePaths := make([]GoldenPath, 0, len(squareDrafts))
 	for i, draft := range squareDrafts {
-		squarePaths = append(squarePaths, goldenPathFromDraft(i+len(diagonalDrafts), draft, minDistance, maxDistance, phi, guideGrowEnd, guideShrinkStart, hiddenStart, hideAt, loopDuration))
+		squarePaths = append(squarePaths, goldenPathFromDraft(i+len(diagonalDrafts), draft, minDistance, maxDistance, phi, guideGrowEnd, guideShrinkStart, guideShrinkEnd, guideHideAt, loopDuration))
 	}
 
 	spiralOuterAnchor := point{x: outerRect.x, y: outerRect.y + outerRect.h}
 	spiralInnerQuarterTurns := float64(len(squares))
-	spiralPath, spiralStart, spiralEnd := buildSpiralPath(pole, spiralOuterAnchor, spiralInnerQuarterTurns, math.Pi/180)
+	outerQuarterTurns := 3.0
+	spiralPath, spiralStart, spiralEnd := buildSpiralPath(pole, spiralOuterAnchor, spiralInnerQuarterTurns, outerQuarterTurns, math.Pi/180)
 
 	layers := []GoldenLayer{
 		{Index: 0},
@@ -248,15 +261,15 @@ func NewGoldenSpiral() GoldenSpiral {
 		SpiralOuterCorner:       "outerRect left-bottom",
 		SpiralVisualStart:       fmt.Sprintf("%.2f %.2f", spiralStart.x, spiralStart.y),
 		SpiralVisualEnd:         fmt.Sprintf("%.2f %.2f", spiralEnd.x, spiralEnd.y),
-		SpiralOuterQuarterTurns: "0",
+		SpiralOuterQuarterTurns: fmt.Sprintf("%.0f", outerQuarterTurns),
 		SpiralInnerQuarterTurns: fmt.Sprintf("%.0f", spiralInnerQuarterTurns),
 		LoopDuration:            fmt.Sprintf("%.3fs", loopDuration),
 		CurveStartPct:           pct(curveGrowStart, loopDuration),
 		CurveFadePct:            pct(curveGrowStart+0.12, loopDuration),
 		CurveGrowEndPct:         pct(curveGrowEnd, loopDuration),
 		CurveShrinkStartPct:     pct(curveShrinkStart, loopDuration),
-		CurveShrinkEndPct:       pct(hiddenStart, loopDuration),
-		CurveHidePct:            pct(hideAt, loopDuration),
+		CurveShrinkEndPct:       pct(curveShrinkEnd, loopDuration),
+		CurveHidePct:            pct(curveHideAt, loopDuration),
 		Squares:                 squarePaths,
 		Diagonals:               diagonals,
 		SpiralPath:              spiralPath,
@@ -267,6 +280,15 @@ func NewGoldenSpiral() GoldenSpiral {
 type point struct {
 	x float64
 	y float64
+}
+
+func scaleRectAround(rect goldenRect, anchor point, scale float64) goldenRect {
+	return goldenRect{
+		x: anchor.x + (rect.x-anchor.x)*scale,
+		y: anchor.y + (rect.y-anchor.y)*scale,
+		w: rect.w * scale,
+		h: rect.h * scale,
+	}
 }
 
 func subdivideGoldenRect(rect goldenRect, maxSquares int) ([]goldenSquare, point) {
@@ -314,16 +336,16 @@ func subdivideGoldenRect(rect goldenRect, maxSquares int) ([]goldenSquare, point
 	return squares, point{x: cx + cw/2, y: cy + ch/2}
 }
 
-func buildSpiralPath(pole, outerAnchor point, innerQuarterTurns, step float64) (string, point, point) {
+func buildSpiralPath(pole, outerAnchor point, innerQuarterTurns, outerQuarterTurns, step float64) (string, point, point) {
 	const quarter = math.Pi / 2
 
 	b := math.Log((1+math.Sqrt(5))/2) / quarter
 	r0 := distance(outerAnchor, pole)
 	theta0 := math.Atan2(outerAnchor.y-pole.y, outerAnchor.x-pole.x)
-	outerT := 0.0
+	outerT := -outerQuarterTurns * quarter
 	innerT := innerQuarterTurns * quarter
 
-	points := make([]point, 0, int(innerT/step)+2)
+	points := make([]point, 0, int((innerT-outerT)/step)+2)
 	for t := innerT; t > outerT; t -= step {
 		points = append(points, spiralPoint(pole, r0, theta0, b, t))
 	}

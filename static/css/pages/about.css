@@ -46,9 +46,10 @@
    * 8.090s  guide paths are fully drawn
    * 12.944s spiral curve is fully drawn; full composition hold starts
    * 14.562s hold ends; spiral starts shrinking back to the pole
-   * 16.180s guide paths start shrinking, outside paths first
-   * 25.889s all strokes are reduced to zero length
-   * 26.507s loop restarts after a 0.618s blank pause
+   * 21.562s spiral fully shrunk; guide paths start shrinking
+   * 26.562s guide paths fully shrunk
+   * 26.682s all strokes hidden
+   * 27.300s loop restarts after a 0.618s blank pause
    */
   --phi: 1.61803398875;
   --golden-curve-delay: 1.618s;

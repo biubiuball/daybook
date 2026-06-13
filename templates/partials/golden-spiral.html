@@ -126,35 +126,11 @@
         {{range $.Spiral.Squares}}
         <path class="golden-rect" d="{{.D}}" pathLength="1" vector-effect="non-scaling-stroke" style="animation-name: golden-guide-life-{{.Order}}; --golden-grow-delay: {{.GrowDelay}}; --golden-shrink-delay: {{.ShrinkDelay}}"></path>
         {{end}}
-        <path class="golden-curve" d="{{$.Spiral.SpiralPath}}" vector-effect="non-scaling-stroke"></path>
+        <path class="golden-curve" d="{{$.Spiral.SpiralPath}}" pathLength="4096"></path>
       </g>
       {{end}}
     </g>
   </svg>
-  <script>
-    (function () {
-      var spiral = document.currentScript.closest(".golden-spiral");
-      if (!spiral) {
-        return;
-      }
 
-      function updateCurveDash() {
-        var curves = spiral.querySelectorAll(".golden-curve");
-        curves.forEach(function (curve) {
-          var matrix = curve.getScreenCTM();
-          if (!matrix) {
-            return;
-          }
-
-          var scale = Math.hypot(matrix.a, matrix.b) || 1;
-          var dashLength = curve.getTotalLength() * scale + 2;
-          curve.style.setProperty("--golden-curve-dash-length", dashLength.toFixed(2));
-        });
-      }
-
-      updateCurveDash();
-      window.addEventListener("resize", updateCurveDash);
-    })();
-  </script>
 </div>
 {{end}}
