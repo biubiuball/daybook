@@ -40,27 +40,32 @@
 
 .golden-spiral {
   /*
-   * Golden background timeline:
+   * Golden background timeline (all durations are φ multiples):
+   *
    * 0.000s  guide paths start growing from the pole outward
-   * 1.618s  spiral curve starts growing from the pole
-   * 8.090s  guide paths are fully drawn
-   * 12.944s spiral curve is fully drawn; full composition hold starts
-   * 14.562s hold ends; spiral starts shrinking back to the pole
-   * 21.562s spiral fully shrunk; guide paths start shrinking
-   * 26.562s guide paths fully shrunk
-   * 26.682s all strokes hidden
-   * 27.300s loop restarts after a 0.618s blank pause
+   * 1.618s  spiral curve starts growing from the pole           (delay = φ)
+   * 8.090s  guide paths are fully drawn                         (duration = 5φ)
+   * 14.708s spiral curve is fully drawn; hold starts            (duration = 5φ²)
+   * 16.326s hold ends; spiral starts shrinking                  (hold = φ)
+   * 24.416s spiral fully shrunk; guides start shrinking         (shrink = 5φ)
+   * 29.416s guide paths fully shrunk                            (shrink = 5)
+   * 29.536s all strokes hidden
+   * 30.154s loop restarts                                       (pause = 1/φ)
+   *
+   * φ relationships:
+   *   curveGrow / guideGrow   = 5φ² / 5φ = φ
+   *   curveGrow / curveShrink = 5φ² / 5φ = φ
+   *   guideGrow / guideShrink = 5φ / 5    = φ
    */
   --phi: 1.61803398875;
   --golden-curve-delay: 1.618s;
   --golden-guide-grow-duration: 8.09s;
-  --golden-curve-grow-duration: 11.326s;
+  --golden-curve-grow-duration: 13.09s;
   --golden-hold-duration: 1.618s;
-  --golden-curve-shrink-duration: 11.326s;
-  --golden-guide-shrink-delay: 1.618s;
-  --golden-guide-shrink-window: 9.708s;
+  --golden-curve-shrink-duration: 8.09s;
+  --golden-guide-shrink-window: 5.0s;
   --golden-hidden-duration: 0.618s;
-  --golden-loop-duration: 26.507s;
+  --golden-loop-duration: 30.154s;
   inset: 0;
   opacity: 0.9;
   pointer-events: none;

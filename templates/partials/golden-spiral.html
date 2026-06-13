@@ -20,12 +20,14 @@
       {{.Spiral.CurveFadePct}}% {
         opacity: 1;
         stroke-dashoffset: var(--golden-curve-dash-length);
+        animation-timing-function: cubic-bezier(0.618, 0, 1, 1);
       }
 
       {{.Spiral.CurveGrowEndPct}}%,
       {{.Spiral.CurveShrinkStartPct}}% {
         opacity: 1;
         stroke-dashoffset: 0;
+        animation-timing-function: cubic-bezier(0, 0, 0.382, 1);
       }
 
       {{.Spiral.CurveShrinkEndPct}}% {

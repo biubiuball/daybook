@@ -166,7 +166,7 @@ func (r Renderer) RenderAbout(outputPath string, data AboutData) error {
 func NewGoldenSpiral() GoldenSpiral {
 	phi := (1 + math.Sqrt(5)) / 2
 	const hiddenDuration = 0.61803398875
-	const maxSquares = 13
+	const maxSquares = 15
 
 	baseOuterRect := goldenRect{
 		x: 560,
@@ -182,7 +182,7 @@ func NewGoldenSpiral() GoldenSpiral {
 	baseOuterAnchor := point{x: baseOuterRect.x, y: baseOuterRect.y + baseOuterRect.h}
 	_, visualAnchor, _ := buildSpiralPath(basePole, baseOuterAnchor, float64(len(baseSquares)), 0, math.Pi/180)
 
-	outerRect := scaleRectAround(baseOuterRect, visualAnchor, phi)
+	outerRect := scaleRectAround(baseOuterRect, visualAnchor, phi*phi*phi)
 	squares, pole := subdivideGoldenRect(outerRect, maxSquares)
 
 	if len(squares) == 0 {
@@ -215,11 +215,15 @@ func NewGoldenSpiral() GoldenSpiral {
 
 	curveGrowStart := phi
 	guideGrowEnd := 5 * phi
-	curveGrowDuration := 7 * phi
+	// 螺旋路径延长后，生长时长 = 辅助线生长时长 × φ = 5φ²
+	curveGrowDuration := 5 * phi * phi
 	curveGrowEnd := curveGrowStart + curveGrowDuration
 	curveShrinkStart := curveGrowEnd + phi
 
 	// 收缩顺序：螺旋曲线先收缩到起点，随后辅助线条收缩并消失。
+	// 收缩时长 = 对应生长时长 ÷ φ（收缩比生长快 φ 倍）。
+	//   曲线收缩 = 5φ² ÷ φ = 5φ
+	//   辅助线收缩 = 5φ ÷ φ = 5
 	curveShrinkDuration := curveGrowDuration / phi
 	curveShrinkEnd := curveShrinkStart + curveShrinkDuration
 	curveHideAt := curveShrinkEnd + 0.12
@@ -242,7 +246,7 @@ func NewGoldenSpiral() GoldenSpiral {
 
 	spiralOuterAnchor := point{x: outerRect.x, y: outerRect.y + outerRect.h}
 	spiralInnerQuarterTurns := float64(len(squares))
-	outerQuarterTurns := 3.0
+	outerQuarterTurns := 0.0
 	spiralPath, spiralStart, spiralEnd := buildSpiralPath(pole, spiralOuterAnchor, spiralInnerQuarterTurns, outerQuarterTurns, math.Pi/180)
 
 	layers := []GoldenLayer{
