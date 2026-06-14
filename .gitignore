@@ -2,14 +2,28 @@
 /public/
 /daybook
 
+# Go generated files
+*.test
+coverage.out
+*.prof
+
 # Future search output
 /.pagefind/
+
+# Local caches
+/.cache/
+/tmp/
+/temp/
 
 # Temporary files
 *.tmp
 *.log
 .DS_Store
 Thumbs.db
+
+# Local environment
+.env
+.env.*
 
 # Editors
 .vscode/

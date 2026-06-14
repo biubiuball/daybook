@@ -1,0 +1,37 @@
+{{define "content"}}
+<div class="notes-page">
+  <main class="archive-page" aria-label="归档">
+    <section class="archive-timeline" aria-label="文章归档">
+      <header class="archive-header">
+        <p class="archive-kicker">Archive</p>
+        <p class="archive-count">共 {{.Total}} 篇文章</p>
+      </header>
+
+      {{if .YearGroups}}
+        {{range .YearGroups}}
+          <section class="archive-year" aria-labelledby="archive-year-{{.Year}}">
+            <h2 id="archive-year-{{.Year}}">{{.Year}}</h2>
+
+            <ol class="archive-list">
+              {{range .Notes}}
+                <li class="archive-item" style="--i: {{.Index}}">
+                  <time datetime="{{.Date}}">{{.DateShort}}</time>
+                  <div class="archive-entry">
+                    <a href="{{.URL}}">{{.Title}}</a>
+                    {{if .ReadingTime}}<span class="archive-reading-time">{{.ReadingTime}}</span>{{end}}
+                    {{if .Summary}}<p>{{.Summary}}</p>{{end}}
+                  </div>
+                </li>
+              {{end}}
+            </ol>
+          </section>
+        {{end}}
+      {{else}}
+        <p class="archive-empty">还没有发布的文章。</p>
+      {{end}}
+    </section>
+  </main>
+
+  {{template "notes_aside" .}}
+</div>
+{{end}}
