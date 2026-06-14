@@ -129,6 +129,29 @@ type NotesData struct {
 	Notes     []NoteLink
 }
 
+type ArchiveNote struct {
+	Index       int
+	Title       string
+	Date        string
+	DateShort   string
+	ReadingTime string
+	Summary     string
+	URL         string
+}
+
+type ArchiveYearGroup struct {
+	Year  string
+	Notes []ArchiveNote
+}
+
+type ArchiveData struct {
+	Site       SiteData
+	PageTitle  string
+	BodyClass  string
+	Total      int
+	YearGroups []ArchiveYearGroup
+}
+
 type NoteData struct {
 	Site      SiteData
 	PageTitle string
@@ -153,6 +176,10 @@ func (r Renderer) RenderIndex(outputPath string, data IndexData) error {
 
 func (r Renderer) RenderNotes(outputPath string, data NotesData) error {
 	return r.render(outputPath, "notes.html", data)
+}
+
+func (r Renderer) RenderArchive(outputPath string, data ArchiveData) error {
+	return r.render(outputPath, "archive.html", data)
 }
 
 func (r Renderer) RenderNote(outputPath string, data NoteData) error {

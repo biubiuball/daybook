@@ -207,6 +207,17 @@ html.article-transition .hero-identity {
   }
 }
 
+@keyframes archive-intro-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .home-exiting .site-nav > * {
   animation: nav-exit-up var(--duration-normal) var(--ease-out) both;
 }
@@ -447,6 +458,17 @@ html:not(.article-transition) body.page-entering .notes-footer > p {
   animation-delay: 320ms;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  body.page-entering .archive-item {
+    animation: archive-intro-fade-up 380ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+}
+
+body.page-entering .archive-item {
+  opacity: 0;
+}
+
 @media (min-width: 961px) {
   .note-body .note-back-link {
     animation: article-back-enter var(--post-enter-duration) var(--ease-page) 200ms both;
@@ -623,6 +645,8 @@ html:not(.article-transition) body.page-entering .notes-footer > p {
   .note-toc,
   .notes-item,
   .notes-item-meta,
+  .archive-year,
+  .archive-item,
   .note-meta,
   .note-summary,
   .note-toc-header,

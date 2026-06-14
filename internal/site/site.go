@@ -116,6 +116,18 @@ func Build(options Options) (BuildResult, error) {
 		return BuildResult{}, fmt.Errorf("生成文章页: %w", err)
 	}
 
+	archivePath := filepath.Join(options.PublicDir, "archive", "index.html")
+	archiveData := render.ArchiveData{
+		Site:       siteData,
+		PageTitle:  "归档",
+		BodyClass:  "archive-body page-body",
+		Total:      len(noteLinks),
+		YearGroups: archiveYearGroups(noteLinks),
+	}
+	if err := renderer.RenderArchive(archivePath, archiveData); err != nil {
+		return BuildResult{}, fmt.Errorf("生成归档页: %w", err)
+	}
+
 	aboutPath := filepath.Join(options.PublicDir, "about", "index.html")
 	aboutData := render.AboutData{
 		Site:      siteData,
@@ -158,6 +170,45 @@ func estimateReadingTime(text string) string {
 	}
 
 	return fmt.Sprintf("%d min", minutes)
+}
+
+func archiveYearGroups(notes []render.NoteLink) []render.ArchiveYearGroup {
+	groups := make([]render.ArchiveYearGroup, 0)
+	currentYear := ""
+
+	for index, note := range notes {
+		year := note.Date
+		if len(year) > 4 {
+			year = year[:4]
+		}
+
+		if year != currentYear {
+			groups = append(groups, render.ArchiveYearGroup{
+				Year:  year,
+				Notes: []render.ArchiveNote{},
+			})
+			currentYear = year
+		}
+
+		groups[len(groups)-1].Notes = append(groups[len(groups)-1].Notes, render.ArchiveNote{
+			Index:       index,
+			Title:       note.Title,
+			Date:        note.Date,
+			DateShort:   archiveDateShort(note.Date),
+			ReadingTime: note.ReadingTime,
+			Summary:     note.Summary,
+			URL:         note.URL,
+		})
+	}
+
+	return groups
+}
+
+func archiveDateShort(date string) string {
+	if len(date) >= 10 {
+		return date[5:10]
+	}
+	return date
 }
 
 func transitionName(prefix, slug string) string {
