@@ -61,6 +61,57 @@
     return (isNotesIndex(currentURL) && isNoteDetail(url)) || (isNoteDetail(currentURL) && isNotesIndex(url));
   }
 
+  function clearListTitleTransitions(root) {
+    root.querySelectorAll("[data-title-transition-name]").forEach(function (titleLink) {
+      titleLink.style.removeProperty("view-transition-name");
+    });
+  }
+
+  function linkMatchesURL(link, url) {
+    var href = link.getAttribute("href");
+    if (!href) {
+      return false;
+    }
+    return cleanPath(new URL(href, window.location.origin)) === cleanPath(url);
+  }
+
+  function findListTitleForURL(root, url) {
+    var titleLinks = root.querySelectorAll("[data-title-transition-name]");
+    for (var i = 0; i < titleLinks.length; i++) {
+      if (linkMatchesURL(titleLinks[i], url)) {
+        return titleLinks[i];
+      }
+    }
+    return null;
+  }
+
+  function setListTitleTransition(titleLink) {
+    if (!titleLink || !titleLink.dataset.titleTransitionName) {
+      return;
+    }
+    titleLink.style.viewTransitionName = titleLink.dataset.titleTransitionName;
+  }
+
+  function prepareArticleTitleTransition(nextDocument, url, sourceLink) {
+    var currentURL = new URL(currentPageKey);
+
+    clearListTitleTransitions(document);
+    clearListTitleTransitions(nextDocument);
+
+    if (isNotesIndex(currentURL) && isNoteDetail(url)) {
+      if (sourceLink && sourceLink.matches("[data-title-transition-name]") && linkMatchesURL(sourceLink, url)) {
+        setListTitleTransition(sourceLink);
+        return;
+      }
+      setListTitleTransition(findListTitleForURL(document, url));
+      return;
+    }
+
+    if (isNoteDetail(currentURL) && isNotesIndex(url)) {
+      setListTitleTransition(findListTitleForURL(nextDocument, currentURL));
+    }
+  }
+
   function isPlainLeftClick(event) {
     return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
   }
@@ -220,7 +271,7 @@
     window.scrollTo(0, 0);
   }
 
-  async function runSwap(nextDocument, url, updateHistory) {
+  async function runSwap(nextDocument, url, updateHistory, sourceLink) {
     var useMotion = !reducedMotion();
     var articleTransition = isArticleTransition(url);
     cancelCleanupTimer();
@@ -230,6 +281,7 @@
       document.documentElement.classList.add("is-transitioning");
       if (articleTransition) {
         document.documentElement.classList.add("article-transition");
+        prepareArticleTitleTransition(nextDocument, url, sourceLink);
       } else {
         document.body.classList.add(exitClassName());
         await wait(cssDuration("--transition-exit-delay", 260));
@@ -251,6 +303,7 @@
 
     if (articleTransition) {
       clearTransitionClasses();
+      clearListTitleTransitions(document);
       return;
     }
 
@@ -259,7 +312,7 @@
     scheduleClearTransitionClasses(useMotion ? cssDuration("--transition-cleanup-delay", 900) : 0);
   }
 
-  async function navigateTo(url, updateHistory) {
+  async function navigateTo(url, updateHistory, sourceLink) {
     if (isNavigating) {
       return;
     }
@@ -275,8 +328,9 @@
     isNavigating = true;
     try {
       var nextDocument = await fetchPage(url);
-      await runSwap(nextDocument, url, updateHistory);
+      await runSwap(nextDocument, url, updateHistory, sourceLink);
     } catch (error) {
+      clearListTitleTransitions(document);
       if (updateHistory) {
         window.location.href = url.href;
       } else {
@@ -294,7 +348,7 @@
     }
 
     event.preventDefault();
-    navigateTo(new URL(link.href, window.location.href), true);
+    navigateTo(new URL(link.href, window.location.href), true, link);
   });
 
   window.addEventListener("popstate", function () {

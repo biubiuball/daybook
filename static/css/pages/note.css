@@ -101,10 +101,20 @@
 
 @media (max-width: 1600px) {
   .note-toc {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(var(--note-toc-hide-y));
-    visibility: hidden;
+    margin-bottom: clamp(2rem, 5vw, 3.2rem);
+    max-width: 100%;
+    opacity: 1;
+    pointer-events: auto;
+    position: static;
+    right: auto;
+    top: auto;
+    transform: none;
+    visibility: visible;
+    width: 100%;
+  }
+
+  .note-toc-panel {
+    max-height: none;
   }
 }
 

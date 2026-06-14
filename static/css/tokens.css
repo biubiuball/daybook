@@ -20,7 +20,7 @@
   --duration-shared: 720ms;
   --duration-article-enter: 500ms;
   --post-enter-duration: 500ms;
-  --post-enter-y: 2rem;
+  --post-enter-y: 3rem;
   --post-stagger-step: 45ms;
   --transition-exit-delay: 320ms;
   --transition-cleanup-delay: 1120ms;

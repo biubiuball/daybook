@@ -143,28 +143,6 @@ html.article-transition .hero-identity {
   }
 }
 
-@keyframes note-enter {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes note-exit-down {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-}
-
 @keyframes aside-enter {
   from {
     opacity: 0;
@@ -373,38 +351,6 @@ html:not(.article-transition) body.page-exiting .side-nav .nav-link:nth-child(5)
   animation-delay: 112ms;
 }
 
-html:not(.article-transition) body.page-exiting .notes-item {
-  animation: note-exit-down var(--duration-normal) var(--ease-out) both;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(1) {
-  animation-delay: 20ms;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(2) {
-  animation-delay: 48ms;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(3) {
-  animation-delay: 76ms;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(4) {
-  animation-delay: 104ms;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(5) {
-  animation-delay: 132ms;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(6) {
-  animation-delay: 160ms;
-}
-
-html:not(.article-transition) body.page-exiting .notes-item:nth-child(n + 7) {
-  animation-delay: 188ms;
-}
-
 html:not(.article-transition) body.page-exiting .notes-footer-actions .notes-action-button,
 html:not(.article-transition) body.page-exiting .notes-footer-links,
 html:not(.article-transition) body.page-exiting .notes-footer > p {
@@ -472,38 +418,6 @@ html:not(.article-transition) body.page-entering.page-body .side-nav .nav-link:n
   animation-delay: 208ms;
 }
 
-html:not(.article-transition) body.page-entering .notes-item {
-  animation: note-enter var(--duration-normal) var(--ease-out) both;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(1) {
-  animation-delay: 90ms;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(2) {
-  animation-delay: 130ms;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(3) {
-  animation-delay: 170ms;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(4) {
-  animation-delay: 210ms;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(5) {
-  animation-delay: 250ms;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(6) {
-  animation-delay: 290ms;
-}
-
-html:not(.article-transition) body.page-entering .notes-item:nth-child(n + 7) {
-  animation-delay: 330ms;
-}
-
 html:not(.article-transition) body.page-entering .notes-footer-actions .notes-action-button {
   animation: aside-enter var(--duration-normal) var(--ease-out) both;
 }
@@ -533,8 +447,10 @@ html:not(.article-transition) body.page-entering .notes-footer > p {
   animation-delay: 320ms;
 }
 
-.note-body .note-back-link {
-  animation: article-back-enter var(--post-enter-duration) var(--ease-page) 200ms both;
+@media (min-width: 961px) {
+  .note-body .note-back-link {
+    animation: article-back-enter var(--post-enter-duration) var(--ease-page) 200ms both;
+  }
 }
 
 .note-body .note-meta {
@@ -545,49 +461,58 @@ html:not(.article-transition) body.page-entering .notes-footer > p {
   animation: article-content-enter-mini var(--post-enter-duration) var(--ease-page) 205ms both;
 }
 
-.note-body .note-toc-header {
-  animation: article-content-enter-mini var(--post-enter-duration) var(--ease-page) 175ms both;
+@media (max-width: 1600px) {
+  .note-body .note-toc {
+    animation: article-content-enter var(--post-enter-duration) var(--ease-page) 100ms both;
+    opacity: 0;
+  }
 }
 
-.note-body .note-toc-panel li {
-  animation: article-content-enter var(--post-enter-duration) var(--ease-page) both;
-  opacity: 0;
-}
+@media (min-width: 1601px) {
+  .note-body .note-toc-header {
+    animation: article-content-enter-mini var(--post-enter-duration) var(--ease-page) 175ms both;
+  }
 
-.note-body .note-toc-panel li:nth-child(1) {
-  animation-delay: 175ms;
-}
+  .note-body .note-toc-panel li {
+    animation: article-content-enter var(--post-enter-duration) var(--ease-page) both;
+    opacity: 0;
+  }
 
-.note-body .note-toc-panel li:nth-child(2) {
-  animation-delay: 200ms;
-}
+  .note-body .note-toc-panel li:nth-child(1) {
+    animation-delay: 175ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(3) {
-  animation-delay: 225ms;
-}
+  .note-body .note-toc-panel li:nth-child(2) {
+    animation-delay: 200ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(4) {
-  animation-delay: 250ms;
-}
+  .note-body .note-toc-panel li:nth-child(3) {
+    animation-delay: 225ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(5) {
-  animation-delay: 275ms;
-}
+  .note-body .note-toc-panel li:nth-child(4) {
+    animation-delay: 250ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(6) {
-  animation-delay: 300ms;
-}
+  .note-body .note-toc-panel li:nth-child(5) {
+    animation-delay: 275ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(7) {
-  animation-delay: 325ms;
-}
+  .note-body .note-toc-panel li:nth-child(6) {
+    animation-delay: 300ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(8) {
-  animation-delay: 350ms;
-}
+  .note-body .note-toc-panel li:nth-child(7) {
+    animation-delay: 325ms;
+  }
 
-.note-body .note-toc-panel li:nth-child(n + 9) {
-  animation-delay: 375ms;
+  .note-body .note-toc-panel li:nth-child(8) {
+    animation-delay: 350ms;
+  }
+
+  .note-body .note-toc-panel li:nth-child(n + 9) {
+    animation-delay: 375ms;
+  }
 }
 
 .note-body .post-content > * {
@@ -658,6 +583,15 @@ html:not(.article-transition) body.page-entering .notes-footer > p {
 .note-body .post-content > *:nth-child(n + 16) {
   animation-delay: 900ms;
 }
+
+@media (max-width: 767px) {
+  .note-body .post-content > *:nth-child(n + 8) {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -685,6 +619,8 @@ html:not(.article-transition) body.page-entering .notes-footer > p {
     animation-duration: 1ms !important;
   }
 
+  .note-back-link,
+  .note-toc,
   .notes-item,
   .notes-item-meta,
   .note-meta,
