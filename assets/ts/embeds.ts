@@ -269,11 +269,11 @@ import { daybookMediaManager } from "./media-manager.js";
     }, 10000);
 
     try {
-      var urlRes = await fetch("https://nmapi.dontpanic.fun/song/url?id=" + id + "&realIP=116.25.146.177");
+      var urlRes = await fetch("https://netease.daybook.page/song/url?id=" + id + "&realIP=116.25.146.177");
       var urlData = await urlRes.json();
       var songUrl = urlData.data && urlData.data[0] && urlData.data[0].url;
 
-      var detailRes = await fetch("https://nmapi.dontpanic.fun/song/detail?ids=" + id);
+      var detailRes = await fetch("https://netease.daybook.page/song/detail?ids=" + id);
       var detailData = await detailRes.json();
       var songDetail = detailData.songs && detailData.songs[0];
 
