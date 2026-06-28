@@ -6,7 +6,7 @@ tags:
   - daybook
   - obsidian
 summary: 测试 Daybook 对 Obsidian Callout、折叠提示块、嵌套提示块和 Callout 内部 Markdown / 双链 / 附件的支持。
-draft: false
+draft: true
 ---
 
 # Obsidian Callout 测试

@@ -6,7 +6,7 @@ tags:
   - daybook
   - obsidian
 summary: 测试 Daybook 对本地附件和 Cloudflare R2 远程附件的图片、PDF、音频、视频嵌入支持。
-draft: false
+draft: true
 ---
 
 # Obsidian 本地与远程附件测试

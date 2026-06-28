@@ -6,7 +6,8 @@ tags:
   - daybook
   - obsidian
 summary: 测试 Daybook 对 Obsidian 页面嵌入、标题嵌入和 block id 嵌入的兼容。
-draft: false
+draft: true
+listed: false
 ---
 ![[JayChou-ai-zai-xi-yuan-qian.FLAC]]
 # Obsidian 嵌入语法测试

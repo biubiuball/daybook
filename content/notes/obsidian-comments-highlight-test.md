@@ -6,7 +6,7 @@ tags:
   - daybook
   - obsidian
 summary: 测试 Daybook 对 Obsidian 注释与高亮语法的支持。
-draft: false
+draft: true
 ---
 
 # Obsidian 注释与高亮测试

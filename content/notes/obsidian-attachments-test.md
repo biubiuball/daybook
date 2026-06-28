@@ -6,7 +6,7 @@ tags:
   - daybook
   - obsidian
 summary: 测试 Daybook 对 Obsidian 图片与 PDF 附件语法的兼容。
-draft: false
+draft: true
 ---
 
 # Obsidian 附件系统测试
