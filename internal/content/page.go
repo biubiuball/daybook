@@ -12,6 +12,7 @@ import (
 type Page struct {
 	Title          string
 	Date           string
+	Updated        string
 	Summary        string
 	Draft          bool
 	Body           string
@@ -23,6 +24,7 @@ type Page struct {
 type pageFrontmatter struct {
 	Title   string `yaml:"title"`
 	Date    string `yaml:"date"`
+	Updated string `yaml:"updated"`
 	Summary string `yaml:"summary"`
 	Draft   bool   `yaml:"draft"`
 }
@@ -50,6 +52,7 @@ func ParsePage(sourcePath, text string) (Page, error) {
 	page := Page{
 		Title:      strings.TrimSpace(meta.Title),
 		Date:       strings.TrimSpace(meta.Date),
+		Updated:    strings.TrimSpace(meta.Updated),
 		Summary:    strings.TrimSpace(meta.Summary),
 		Draft:      meta.Draft,
 		Body:       strings.TrimSpace(body),

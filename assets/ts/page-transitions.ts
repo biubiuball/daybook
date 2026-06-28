@@ -10,7 +10,8 @@
   history.replaceState({ daybook: true }, "", window.location.href);
 
   function reducedMotion() {
-    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return document.documentElement.getAttribute('data-reduced-motion') === 'true' || 
+           (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }
 
   function wait(ms: number): Promise<void> {

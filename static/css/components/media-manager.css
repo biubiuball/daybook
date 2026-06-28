@@ -1,0 +1,69 @@
+
+/* Hide default reading controls when active */
+/* Note: Desktop reading controls fade out animation is handled in note.css */
+body[data-media-manager-active="true"] .mobile-reading-controls {
+  display: none !important;
+}
+
+.mm-desktop-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: fixed;
+  bottom: 160px;
+  left: var(--persistent-logo-left, 3.5rem);
+  z-index: 900;
+  pointer-events: none;
+}
+
+body[data-media-manager-active="true"] .mm-desktop-ui {
+  pointer-events: auto;
+}
+
+.mm-desktop-ui .reading-control-btn {
+  opacity: 0;
+  animation: mm-fade-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+body[data-media-manager-active="true"] .mm-desktop-ui .reading-control-btn {
+  animation: mm-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Entry stagger */
+body[data-media-manager-active="true"] .mm-btn-return { animation-delay: 0ms; }
+body[data-media-manager-active="true"] .mm-btn-play-pause { animation-delay: 40ms; }
+body[data-media-manager-active="true"] .mm-btn-close { animation-delay: 80ms; }
+
+/* Exit stagger */
+.mm-desktop-ui .mm-btn-close { animation-delay: 0ms; }
+.mm-desktop-ui .mm-btn-play-pause { animation-delay: 40ms; }
+.mm-desktop-ui .mm-btn-return { animation-delay: 80ms; }
+
+.mm-progress-text {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.mm-btn-return .hover-icon {
+  display: none;
+  font-size: 1.1rem;
+}
+
+.mm-btn-return:hover .mm-progress-text,
+.mm-btn-return:focus-visible .mm-progress-text {
+  display: none;
+}
+
+.mm-btn-return:hover .hover-icon,
+.mm-btn-return:focus-visible .hover-icon {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mm-desktop-ui {
+    display: none;
+  }
+}

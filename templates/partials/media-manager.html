@@ -1,0 +1,22 @@
+{{define "media_manager"}}
+<div class="media-manager-container" id="daybook-media-manager" data-media-manager-active="false" style="--media-progress: 0%;">
+  
+  <!-- Hidden container for reparented audio element -->
+  <div class="mm-audio-container" hidden></div>
+
+  <!-- Desktop UI: Three circular buttons -->
+  <div class="mm-desktop-ui" aria-label="后台播放控制" aria-hidden="true">
+    <button class="reading-control-btn mm-btn-play-pause" type="button" aria-label="暂停">
+      <span class="material-symbol mm-icon-current" aria-hidden="true">pause</span>
+    </button>
+    <button class="reading-control-btn mm-btn-return" type="button" aria-label="返回正在播放的文章">
+      <span class="mm-progress-text">0%</span>
+      <span class="material-symbol hover-icon" aria-hidden="true">arrow_back</span>
+    </button>
+    <button class="reading-control-btn mm-btn-close" type="button" aria-label="关闭后台播放">
+      <span class="material-symbol" aria-hidden="true">close</span>
+    </button>
+  </div>
+
+</div>
+{{end}}

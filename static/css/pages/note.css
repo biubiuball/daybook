@@ -279,7 +279,7 @@
 .reading-control-btn {
   align-items: center;
   background: var(--color-paper);
-  border: none;
+  border: 1px solid var(--color-line);
   border-radius: 999px;
   color: var(--color-text);
   cursor: pointer;
@@ -292,9 +292,23 @@
   overflow: hidden;
   padding: 0;
   position: relative;
-  transition: color 160ms ease;
+  transition: color 160ms ease, border-color 160ms ease;
   width: 44px;
+  animation: mm-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+@keyframes mm-fade-in {
+  0% { opacity: 0; transform: translateX(-15px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes mm-fade-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-15px); }
+}
+
+.reading-control-btn.back-to-top-btn { animation-delay: 0ms; }
+.reading-control-btn.reading-progress-btn { animation-delay: 40ms; }
 
 .reading-progress-btn {
 }
@@ -302,6 +316,7 @@
 .reading-control-btn:hover,
 .reading-control-btn:focus-visible {
   color: var(--color-page);
+  border-color: var(--color-text);
 }
 
 .reading-control-btn::before {

@@ -66,7 +66,7 @@ export function initSettingsOverlay() {
   setupCheckbox('setting-system-cursor', 'useSystemCursor');
   setupCheckbox('setting-bg-playback', 'disableBackgroundPlayback');
   setupCheckbox('setting-disable-comments', 'disableComments');
-  setupCheckbox('setting-disable-title-transition', 'disableTitleTransition');
+  setupCheckbox('setting-reduced-motion', 'reducedMotion');
 
   const syncLanguage = (lang: string) => {
     // Normalize language string

@@ -2,9 +2,10 @@
 <!doctype html>
 <html lang="{{if .Lang}}{{.Lang}}{{else}}zh-CN{{end}}">
 {{template "head" .}}
-<body class="{{.BodyClass}}" data-page-kind="{{.PageKind}}" data-search-index-url="/search.json">
+<body class="{{.BodyClass}}" data-page-kind="{{.PageKind}}" data-search-index-url="/search.json" data-media-manager-active="false">
   {{template "persistent_logo" .}}
   {{template "settings_overlay" .}}
+  {{template "media_manager" .}}
 
   <div class="page-frame" id="daybook-page" data-daybook-page>
   {{if eq .PageKind "home"}}
@@ -53,6 +54,8 @@
     import("{{.Assets.Path "/js/settings-overlay.js"}}").then(module => {
       module.initSettingsOverlay();
     });
+
+    import("{{.Assets.Path "/js/media-manager.js"}}");
   </script>
 </body>
 </html>

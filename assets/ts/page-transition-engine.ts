@@ -18,7 +18,7 @@ interface MorphItem {
   animation?: Animation | null;
   clones?: HTMLElement[];
   clone?: HTMLElement;
-  kind: "title-tokens" | "title" | "meta";
+  kind: "title-tokens" | "title" | "meta" | "reading-controls";
   sourceElement: HTMLElement;
   sourceSnapshot: MorphSnapshot;
   sourceTokens?: TokenSnapshot[];
@@ -40,7 +40,8 @@ interface ArticleMorphSession {
   let activeArticleMorph: ArticleMorphSession | null = null;
 
   function reducedMotion(): boolean {
-    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return document.documentElement.getAttribute('data-reduced-motion') === 'true' || 
+           (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }
 
   function cssDuration(name: string, fallback: number): number {
@@ -75,7 +76,7 @@ interface ArticleMorphSession {
   }
 
   function isArticleTransition(currentUrlStr: string, targetUrlStr: string): boolean {
-    if (document.documentElement.getAttribute('data-title-transition-disabled') === 'true') {
+    if (reducedMotion()) {
       return false;
     }
     return Boolean(articleTransitionInfo(currentUrlStr, targetUrlStr));
@@ -497,10 +498,10 @@ interface ArticleMorphSession {
     };
   }
 
-  function createBlockMorphItem(layer: HTMLElement, sourceElement: HTMLElement, snapshot: MorphSnapshot, kind: "title" | "meta"): MorphItem {
+  function createBlockMorphItem(layer: HTMLElement, sourceElement: HTMLElement, snapshot: MorphSnapshot, kind: "title" | "meta" | "reading-controls"): MorphItem {
     const clone = document.createElement("span");
     clone.className = `article-morph-clone article-morph-clone-${kind}`;
-    if (kind === "meta") {
+    if (kind === "meta" || kind === "reading-controls") {
       clone.innerHTML = sourceElement.innerHTML;
     } else {
       clone.textContent = snapshot.text;
@@ -551,6 +552,32 @@ interface ArticleMorphSession {
           items.push(createBlockMorphItem(layer, sourceMeta, sourceMetaSnapshot, "meta"));
         }
       }
+    }
+
+    if (!isMobile && info.direction === "to-list") {
+      const btns = document.querySelectorAll('.desktop-reading-controls .reading-control-btn');
+      btns.forEach((btn, index) => {
+        const sourceElement = btn as HTMLElement;
+        const snapshot = captureElement(sourceElement);
+        if (snapshot) {
+          const item = createBlockMorphItem(layer, sourceElement, snapshot, "reading-controls");
+          // Re-add original class for correct styling inside clone
+          item.clone!.classList.add('reading-control-btn');
+          if (sourceElement.classList.contains('back-to-top-btn')) {
+            item.clone!.classList.add('back-to-top-btn');
+          } else if (sourceElement.classList.contains('reading-progress-btn')) {
+            item.clone!.classList.add('reading-progress-btn');
+          }
+          // Remove transition/animation so we can control via Web Animations API
+          item.clone!.style.transition = 'none';
+          item.clone!.style.animation = 'none';
+          // Ensure it's positioned exactly correctly
+          item.clone!.style.position = 'absolute';
+          item.clone!.style.margin = '0';
+          item.clone!.style.transform = 'translateX(0)';
+          items.push(item);
+        }
+      });
     }
 
     activeArticleMorph = {
@@ -669,6 +696,25 @@ interface ArticleMorphSession {
     const finished: Promise<any>[] = [];
 
     for (const item of session.items) {
+      if (item.kind === "reading-controls") {
+        if (item.clone) {
+          const isTopBtn = item.clone.classList.contains('back-to-top-btn');
+          const delay = isTopBtn ? 40 : 0;
+          const anim = item.clone.animate([
+            { opacity: 1, transform: "translateX(0)" },
+            { opacity: 0, transform: "translateX(-15px)" }
+          ], {
+            duration: 400,
+            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+            fill: "forwards",
+            delay
+          });
+          item.animation = anim;
+          finished.push(anim.finished);
+        }
+        continue;
+      }
+
       const targetElement = item.kind === "meta" ? findMetaBySlug(document, session.slug) : findTitleBySlug(document, session.slug);
       if (!targetElement) {
         continue;

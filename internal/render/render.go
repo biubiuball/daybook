@@ -43,6 +43,7 @@ type Heading struct {
 type NoteLink struct {
 	Title               string
 	Date                string
+	Updated             string
 	Lang                string
 	ReadingTime         string
 	ReadingMinutes      int
@@ -236,22 +237,24 @@ type NoteData struct {
 }
 
 type AboutData struct {
-	Site         SiteData
-	PageTitle    string
-	PageKind     string
-	BodyClass    string
-	Lang         string
-	AlternateURL string
-	Assets       Assets
-	HasMath      bool
-	Spiral       GoldenSpiral
-	Title        string
-	Summary      string
-	Date         string
-	ReadingTime  string
-	WordCount    int
-	HTML         template.HTML
-	Tags         []TagLink
+	Site           SiteData
+	PageTitle      string
+	PageKind       string
+	BodyClass      string
+	Lang           string
+	AlternateURL   string
+	Assets         Assets
+	HasMath        bool
+	Spiral         GoldenSpiral
+	HasTranslation bool
+	Title          string
+	Summary        string
+	Date           string
+	Updated        string
+	ReadingTime    string
+	WordCount      int
+	HTML           template.HTML
+	Tags           []TagLink
 }
 
 type GraphData struct {

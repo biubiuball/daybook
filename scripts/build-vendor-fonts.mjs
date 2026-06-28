@@ -1,4 +1,4 @@
-import { cp, copyFile, mkdir, rm, stat } from "node:fs/promises";
+import { cp, copyFile, mkdir, rm, stat, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
@@ -59,22 +59,13 @@ await copyFileClean(
 // Subset Cormorant Garamond Italic
 async function subsetCormorantGaramond() {
   const fontDir = path.join(root, "static", "vendor", "fonts", "cormorant-garamond");
-  const tempTtf = path.join("/tmp", "CormorantGaramond-Italic.ttf");
+  const tempTtf = path.join(root, "tools", "font-subsets", "source", "cormorant-garamond", "CormorantGaramond-Italic.ttf");
   const targetWoff2 = path.join(fontDir, "cormorant-garamond-meta.woff2");
 
   await mkdir(fontDir, { recursive: true });
 
-  console.log("Downloading CormorantGaramond-Italic.ttf...");
-  await new Promise((resolve, reject) => {
-    const wget = spawn("wget", ["-q", "-O", tempTtf, "https://github.com/google/fonts/raw/main/ofl/cormorantgaramond/CormorantGaramond-Italic%5Bwght%5D.ttf"], { stdio: "inherit" });
-    wget.on("close", (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`wget failed with code ${code}`));
-    });
-  });
-
   console.log("Subsetting Cormorant Garamond...");
-  const chars = "0123456789acdehimnprstuvw-";
+  const chars = (await readFile(path.join(root, "tools", "font-subsets", "glyphs", "cormorant-garamond-meta.txt"), "utf-8")).trim();
   await new Promise((resolve, reject) => {
     const subset = spawn("pyftsubset", [
       tempTtf,
@@ -92,25 +83,13 @@ async function subsetCormorantGaramond() {
 
 async function subsetSettingsFonts() {
   const fontDir = path.join(root, "static", "vendor", "fonts", "settings");
-  const tempEng = path.join("/tmp", "CormorantGaramond.ttf");
-  const tempZh = path.join("/tmp", "NotoSerifSC.ttf");
+  const tempEng = path.join(root, "tools", "font-subsets", "source", "cormorant-garamond", "CormorantGaramond.ttf");
+  const tempZh = path.join(root, "tools", "font-subsets", "source", "noto-serif-sc", "NotoSerifSC.ttf");
   
   const targetEng = path.join(fontDir, "cormorant-garamond-settings.woff2");
   const targetZh = path.join(fontDir, "noto-serif-sc-settings.woff2");
 
   await mkdir(fontDir, { recursive: true });
-
-  console.log("Downloading CormorantGaramond[wght].ttf...");
-  await new Promise((resolve, reject) => {
-    const wget = spawn("wget", ["-q", "-O", tempEng, "https://github.com/google/fonts/raw/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf"], { stdio: "inherit" });
-    wget.on("close", (code) => code === 0 ? resolve() : reject(new Error(`wget failed with code ${code}`)));
-  });
-
-  console.log("Downloading NotoSerifSC[wght].ttf...");
-  await new Promise((resolve, reject) => {
-    const wget = spawn("wget", ["-q", "-O", tempZh, "https://github.com/google/fonts/raw/main/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf"], { stdio: "inherit" });
-    wget.on("close", (code) => code === 0 ? resolve() : reject(new Error(`wget failed with code ${code}`)));
-  });
 
   console.log("Subsetting settings fonts...");
   
@@ -127,7 +106,7 @@ async function subsetSettingsFonts() {
   console.log(`Subsampled Settings Eng -> ${targetEng}`);
 
   // Chinese: exact subset from settings-overlay.html
-  const zhChars = "设置关闭面板使用系统默认光标禁用后台播放评论区标题过渡动画";
+  const zhChars = (await readFile(path.join(root, "tools", "font-subsets", "glyphs", "noto-serif-sc-settings.txt"), "utf-8")).trim();
   await new Promise((resolve, reject) => {
     const subset = spawn("pyftsubset", [
       tempZh,

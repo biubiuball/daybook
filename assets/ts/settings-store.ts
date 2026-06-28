@@ -2,16 +2,16 @@ export interface DaybookSettings {
   useSystemCursor: boolean;
   disableBackgroundPlayback: boolean;
   disableComments: boolean;
-  disableTitleTransition: boolean;
+  reducedMotion: boolean;
 }
 
 const STORAGE_KEY = 'daybook:user-settings';
 
 const DEFAULT_SETTINGS: DaybookSettings = {
   useSystemCursor: false,
-  disableBackgroundPlayback: false,
+  disableBackgroundPlayback: true,
   disableComments: false,
-  disableTitleTransition: false
+  reducedMotion: false
 };
 
 let currentSettings: DaybookSettings = { ...DEFAULT_SETTINGS };
@@ -59,13 +59,21 @@ export function syncSettingsToDOM() {
     html.removeAttribute('data-comments-disabled');
   }
 
-  if (currentSettings.disableTitleTransition) {
-    html.setAttribute('data-title-transition-disabled', 'true');
+  if (currentSettings.reducedMotion) {
+    html.setAttribute('data-reduced-motion', 'true');
   } else {
-    html.removeAttribute('data-title-transition-disabled');
+    html.removeAttribute('data-reduced-motion');
   }
 }
 
 // Ensure state is loaded and synced when module initializes
 loadSettings();
 syncSettingsToDOM();
+
+// Keep state synced across different ES modules if they are bundled separately
+document.addEventListener('daybook:settings-change', (e: Event) => {
+  const customEvent = e as CustomEvent<DaybookSettings>;
+  if (customEvent.detail) {
+    currentSettings = { ...currentSettings, ...customEvent.detail };
+  }
+});

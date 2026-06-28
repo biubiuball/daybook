@@ -1,5 +1,6 @@
 import { createFallbackElement, setupIframeEmbeds } from "./embed-loading.js";
 import { setupImages } from "./image-loader.js";
+import { daybookMediaManager } from "./media-manager.js";
 
 (function () {
   var compactNumberFormat = new Intl.NumberFormat("en", {
@@ -323,6 +324,15 @@ import { setupImages } from "./image-loader.js";
 
       var playerWrapper = container.querySelector(".nm-player") as HTMLElement;
       var audio = container.querySelector("audio") as HTMLAudioElement;
+      
+      const claimedAudio = daybookMediaManager.claimAudio(id);
+      if (claimedAudio) {
+        audio.remove();
+        playerWrapper.appendChild(claimedAudio);
+        audio = claimedAudio;
+      }
+
+
       var playBtn = container.querySelector(".nm-playbtn") as HTMLButtonElement;
       var iconSpan = container.querySelector(".nm-icon") as HTMLElement;
       var timeDiv = container.querySelector(".nm-time") as HTMLElement;
@@ -363,6 +373,9 @@ import { setupImages } from "./image-loader.js";
         isPlaying = true;
         playerWrapper.classList.add("is-playing");
         swapIcon("pause");
+        
+        daybookMediaManager.notifyPlay(audio, location.href, id as string);
+        
         lastTime = performance.now();
         if (!reqId) loop(lastTime);
       });
@@ -392,14 +405,28 @@ import { setupImages } from "./image-loader.js";
       });
 
       audio.addEventListener("loadedmetadata", function() {
-        timeDiv.textContent = "0:00 / " + formatTime(audio.duration);
-        drawWave(0, wavePhase);
-        if (autostart) {
+        timeDiv.textContent = formatTime(audio.currentTime) + " / " + formatTime(audio.duration);
+        drawWave(audio.duration ? audio.currentTime / audio.duration : 0, wavePhase);
+        if (autostart && !claimedAudio) {
           audio.play().catch(function(err) {
             console.warn("Autoplay prevented by browser:", err);
           });
         }
       });
+
+      if (audio.readyState >= 1) {
+        timeDiv.textContent = formatTime(audio.currentTime) + " / " + formatTime(audio.duration);
+        smoothedProgress = audio.duration ? audio.currentTime / audio.duration : 0;
+        drawWave(smoothedProgress, wavePhase);
+      }
+
+      if (!audio.paused) {
+        isPlaying = true;
+        playerWrapper.classList.add("is-playing");
+        iconSpan.textContent = "pause"; // Sync icon immediately without animation
+        lastTime = performance.now();
+        if (!reqId) loop(lastTime);
+      }
 
       canvas.addEventListener("pointerdown", function(e: PointerEvent) {
         drag = true;
@@ -549,13 +576,7 @@ import { setupImages } from "./image-loader.js";
   });
 
   document.addEventListener("daybook:before-swap", function () {
-    // Pause any active netease audio players to prevent ghost audio
-    document.querySelectorAll(".nm-player audio").forEach(function(audioEl) {
-      const audio = audioEl as HTMLAudioElement;
-      if (!audio.paused) {
-        audio.pause();
-      }
-    });
+    // The MediaManager now handles audio takeover or stopping logic.
   });
 
 })();

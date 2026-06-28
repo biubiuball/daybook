@@ -227,6 +227,7 @@ func Build(options Options) (BuildResult, error) {
 			noteLink := render.NoteLink{
 				Title:               note.Title,
 				Date:                note.Date,
+				Updated:             note.Updated,
 				Lang:                lang,
 				ReadingTime:         readingTime,
 				ReadingMinutes:      note.ReadingMinutes,
@@ -349,6 +350,23 @@ func Build(options Options) (BuildResult, error) {
 			}
 		}
 
+		sortByUpdated := func(i, j int, list []render.NoteLink) bool {
+			timeI := list[i].Updated
+			if timeI == "" {
+				timeI = list[i].Date
+			}
+			timeJ := list[j].Updated
+			if timeJ == "" {
+				timeJ = list[j].Date
+			}
+			if timeI == timeJ {
+				return list[i].Title < list[j].Title
+			}
+			return timeI > timeJ
+		}
+		sort.SliceStable(pinnedNotes, func(i, j int) bool { return sortByUpdated(i, j, pinnedNotes) })
+		sort.SliceStable(regularNotes, func(i, j int) bool { return sortByUpdated(i, j, regularNotes) })
+
 		notesIndexPath := filepath.Join(langPublicDir, "notes", "index.html")
 		notesData := render.NotesData{
 			Site:         siteData,
@@ -403,23 +421,53 @@ func Build(options Options) (BuildResult, error) {
 		}
 		aboutDocument.HTML = obsidian.RestoreHTML(aboutDocument.HTML, aboutProcessed.HTML)
 
+		aboutEnPath := filepath.Join(filepath.Dir(options.NotesDir), "pages", "about-en.md")
+		aboutZhPath := filepath.Join(filepath.Dir(options.NotesDir), "pages", "about.md")
+		aboutHasTranslation := false
+		if _, err1 := os.Stat(aboutEnPath); err1 == nil {
+			if _, err2 := os.Stat(aboutZhPath); err2 == nil {
+				aboutHasTranslation = true
+			}
+		}
+
 		aboutPath := filepath.Join(langPublicDir, "about", "index.html")
+
+		aboutFragmentPath := filepath.Join(langPublicDir, "about", "fragment.json")
+		type aboutFragmentData struct {
+			Lang     string           `json:"lang"`
+			Summary  string           `json:"summary"`
+			HTML     string           `json:"html"`
+			Headings []render.Heading `json:"headings"`
+		}
+		aboutFrag := aboutFragmentData{
+			Lang:     lang,
+			Summary:  aboutPage.Summary,
+			HTML:     string(aboutDocument.HTML),
+			Headings: renderHeadings(aboutDocument.Headings),
+		}
+		if b, err := json.Marshal(aboutFrag); err == nil {
+			os.MkdirAll(filepath.Dir(aboutFragmentPath), 0755)
+			os.WriteFile(aboutFragmentPath, b, 0644)
+		}
+
 		aboutData := render.AboutData{
-			Site:         siteData,
-			PageTitle:    aboutPage.Title,
-			PageKind:     "about",
-			BodyClass:    "about-body page-body",
-			Lang:         lang,
-			AlternateURL: path.Join("/", altLangPrefix, "about", "/"),
-			Assets:       assets,
-			Spiral:       render.NewGoldenSpiral(),
-			Title:        aboutPage.Title,
-			Summary:      aboutPage.Summary,
-			Date:         aboutPage.Date,
-			ReadingTime:  estimateReadingTime(aboutPage.Body),
-			WordCount:    aboutPage.WordCount,
-			HTML:         template.HTML(aboutDocument.HTML),
-			Tags:         tagLinks,
+			Site:           siteData,
+			PageTitle:      aboutPage.Title,
+			PageKind:       "about",
+			BodyClass:      "about-body page-body",
+			Lang:           lang,
+			AlternateURL:   path.Join("/", altLangPrefix, "about", "/"),
+			Assets:         assets,
+			Spiral:         render.NewGoldenSpiral(),
+			HasTranslation: aboutHasTranslation,
+			Title:          aboutPage.Title,
+			Summary:        aboutPage.Summary,
+			Date:           aboutPage.Date,
+			Updated:        aboutPage.Updated,
+			ReadingTime:    estimateReadingTime(aboutPage.Body),
+			WordCount:      aboutPage.WordCount,
+			HTML:           template.HTML(aboutDocument.HTML),
+			Tags:           tagLinks,
 		}
 		if err := renderer.RenderAbout(aboutPath, aboutData); err != nil {
 			return BuildResult{}, fmt.Errorf("生成关于页: %w", err)
@@ -521,7 +569,10 @@ func monthGroups(notes []render.NoteLink) []render.MonthGroup {
 	currentMonth := ""
 
 	for _, note := range notes {
-		month := note.Date
+		month := note.Updated
+		if month == "" {
+			month = note.Date
+		}
 		if len(month) >= 7 {
 			month = month[:7]
 		}
