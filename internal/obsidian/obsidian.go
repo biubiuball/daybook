@@ -101,6 +101,19 @@ func Process(input string, index Index) Result {
 		HTML: make(map[string]string),
 	}
 
+	protectedTokens := make(map[string]string)
+	protect := func(pattern *regexp.Regexp) {
+		result.Text = pattern.ReplaceAllStringFunc(result.Text, func(match string) string {
+			token := fmt.Sprintf("DAYBOOK_PROTECTED_%d", len(protectedTokens))
+			protectedTokens[token] = match
+			return token
+		})
+	}
+
+	// Protect code blocks and inline code
+	protect(regexp.MustCompile("(?s)```.*?```"))
+	protect(regexp.MustCompile("(?s)`.*?`"))
+
 	result.Text = replaceImageHTML(result.Text, true, result.HTML)
 	result.Text = replaceImageHTML(result.Text, false, result.HTML)
 	result.Text = rewriteMarkdownImagePaths(result.Text)
@@ -197,6 +210,12 @@ func Process(input string, index Index) Result {
 
 		return "[" + escapeMarkdownLabel(label) + "](" + escapeMarkdownURL(href) + ")"
 	})
+
+	// Restore protected text
+	for i := len(protectedTokens) - 1; i >= 0; i-- {
+		token := fmt.Sprintf("DAYBOOK_PROTECTED_%d", i)
+		result.Text = strings.ReplaceAll(result.Text, token, protectedTokens[token])
+	}
 
 	return result
 }
