@@ -879,7 +879,10 @@ func copyAttachments(contentDir, publicDir string, cfg config.AttachmentConfig) 
 	sourceDir := filepath.Join(contentDir, "attachments")
 	targetDir := filepath.Join(publicDir, "attachments")
 
-	return copyDirFiltered(sourceDir, targetDir, func(relativePath string, entry os.DirEntry) bool {
+	var remoteSkipCount int
+	const maxRemoteSkipLogs = 3
+
+	err := copyDirFiltered(sourceDir, targetDir, func(relativePath string, entry os.DirEntry) bool {
 		if entry.IsDir() {
 			return false // Don't skip directories entirely yet, allow traversing
 		}
@@ -902,13 +905,21 @@ func copyAttachments(contentDir, publicDir string, cfg config.AttachmentConfig) 
 		}
 
 		if isRemote {
-			pubURL := cfg.RemoteBaseURL + "/" + escapeURLPath(relPath)
-			fmt.Printf("[obsidian] remote attachment not copied: %s -> %s\n", relPath, pubURL)
+			if remoteSkipCount < maxRemoteSkipLogs {
+				fmt.Printf("[obsidian] skip remote: %s\n", relPath)
+			}
+			remoteSkipCount++
 			return true // Skip remote files
 		}
 
 		return false // Copy local files
 	})
+
+	if remoteSkipCount > maxRemoteSkipLogs {
+		fmt.Printf("[obsidian] ... 以及另外 %d 个远程附件已被跳过\n", remoteSkipCount-maxRemoteSkipLogs)
+	}
+
+	return err
 }
 
 func Serve(publicDir, address string) error {
