@@ -218,7 +218,7 @@ comment: true
 * `tags` (可选): 文章的标签数组。未填默认为空。
 * `summary` (可选): 列表页展示的摘要。未填默认为空。
 * `draft` (可选): 设置为 `true` 时，文章不会在正式构建中发布。未填默认为 `false`。
-* `listed` (可选): 设置为 `false` 时，文章不会出现在列表、归档及全局图谱中（仅可通过直接链接访问）。例如，`https://daybook.page/notes/hello-daybook/` 没有被博客收录，但是可以通过直连访问。未填默认为 `true`。
+* `listed` (可选): 设置为 `false` 时，文章不会出现在列表、归档及全局图谱中（仅可通过直接链接访问）。例如，`https://daybook.page/notes/hello-daybook/` 没有被博客收录，但是可以通过[直链](https://daybook.page/notes/hello-daybook/)访问。未填默认为 `true`。
 * `math` (可选): 文章包含公式时设置为 `true`，以加载 KaTeX。未填默认为 `false`。
 * `pin` (可选): 是否在列表或首页置顶。未填默认为 `false`。
 * `comment` (可选): 设置为 `false` 可对单篇文章关闭 Waline 评论区。未填默认为 `true`（开启评论）。
