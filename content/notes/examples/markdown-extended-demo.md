@@ -9,6 +9,8 @@ tags:
 summary: 用于检查 daybook Markdown 扩展语法、嵌入组件、Lightbox、Mermaid 和嵌套任务列表渲染。
 draft: false
 toc: false
+i18n_key: markdown-extended-demo
+lang: zh-CN
 ---
 
 本文介绍 Markdown 扩展功能，包括语法示例与效果展示。
