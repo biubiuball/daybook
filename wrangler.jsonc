@@ -7,7 +7,7 @@
     {
       "binding": "DB",
       "database_name": "daybook_stats",
-      "database_id": "e7e159a5-e980-4d57-a811-b97975c32390",
+      "database_id": "f373919b-3983-4886-a54f-99fe8cd06917",
       "migrations_dir": "migrations"
     }
   ]
