@@ -1,8 +1,47 @@
 package config
 
 import (
+	"encoding/json"
 	"os"
 )
+
+type ProfileConfig struct {
+	Author struct {
+		Name           string `json:"name"`
+		NameEn         string `json:"nameEn"`
+		Avatar         string `json:"avatar"`
+		SignatureImage string `json:"signatureImage"`
+		AboutUrl       string `json:"aboutUrl"`
+	} `json:"author"`
+	Slogan map[string]string `json:"slogan"`
+	SEO    struct {
+		HomeTitle       map[string]string `json:"homeTitle"`
+		HomeDescription map[string]string `json:"homeDescription"`
+	} `json:"seo"`
+}
+
+func (p ProfileConfig) getMultilingualString(dict map[string]string, lang string) string {
+	if val, ok := dict[lang]; ok && val != "" {
+		return val
+	}
+	// Fallback to "zh" if lang is missing or empty
+	if val, ok := dict["zh"]; ok && val != "" {
+		return val
+	}
+	return ""
+}
+
+func (p ProfileConfig) GetSlogan(lang string) string {
+	return p.getMultilingualString(p.Slogan, lang)
+}
+
+func (p ProfileConfig) GetHomeTitle(lang string) string {
+	return p.getMultilingualString(p.SEO.HomeTitle, lang)
+}
+
+func (p ProfileConfig) GetHomeDescription(lang string) string {
+	return p.getMultilingualString(p.SEO.HomeDescription, lang)
+}
 
 type WalineConfig struct {
 	ServerURL      string `yaml:"serverURL"`
@@ -44,6 +83,7 @@ type Config struct {
 	Attachments AttachmentConfig `yaml:"attachments"`
 	Netease     NeteaseConfig
 	Stats       StatsConfig
+	Profile     ProfileConfig
 }
 
 func getEnvOrDefault(key, fallback string) string {
@@ -84,6 +124,17 @@ func Load() (Config, error) {
 			Enabled: os.Getenv("DAYBOOK_STATS_ENABLED") == "true",
 			APIBase: getEnvOrDefault("DAYBOOK_STATS_API_BASE", "/api"),
 		},
+	}
+
+	profileData, err := os.ReadFile("data/profile.json")
+	if err == nil {
+		_ = json.Unmarshal(profileData, &cfg.Profile)
+	} else {
+		// Provide default fallbacks if missing
+		cfg.Profile.Author.Name = "史帙"
+		cfg.Profile.Author.NameEn = "Daybook"
+		cfg.Profile.Author.Avatar = "/images/avatar/shelby.jpg"
+		cfg.Profile.Author.AboutUrl = "/about/"
 	}
 
 	return cfg, nil

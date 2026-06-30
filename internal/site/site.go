@@ -392,8 +392,8 @@ func Build(options Options) (BuildResult, error) {
 		homeSEOArgs := seo.BuilderArgs{
 			Config:      options.Config,
 			Lang:        lang,
-			Title:       i18n.T(lang, "seo.home.title"),
-			Description: i18n.T(lang, "seo.home.description"),
+			Title:       options.Config.Profile.GetHomeTitle(lang),
+			Description: options.Config.Profile.GetHomeDescription(lang),
 			PageURL:     joinURL("/", langPrefix),
 			Alternates:  homeAlternates,
 		}

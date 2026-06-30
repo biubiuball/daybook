@@ -147,22 +147,33 @@ hr.notes-divider {
 }
 
 .notes-brand-cn {
+  font-family: var(--font-signature-cn);
   font-size: clamp(2.2rem, 3vw, 3rem);
   display: inline-block;
+  align-self: baseline;
+  width: auto;
+  height: auto;
+  color: var(--color-text);
+  background-color: transparent;
+  -webkit-mask-image: none;
+  mask-image: none;
+  user-select: auto;
+}
+
+.notes-brand-cn.has-signature-image {
   width: 1.8em;
   height: 0.85em;
   background-color: var(--color-text);
-  -webkit-mask-image: url('/images/ShiZhi.png');
+  -webkit-mask-image: var(--signature-url);
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
-  mask-image: url('/images/ShiZhi.png');
+  mask-image: var(--signature-url);
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
   color: transparent;
   user-select: none;
-  align-self: baseline;
 }
 
 .notes-brand-en {

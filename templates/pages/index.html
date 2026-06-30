@@ -1,17 +1,17 @@
 {{define "content"}}
 <section class="home-hero" aria-label="{{T .Lang "home.hero_label"}}">
   <div class="hero-avatar-wrap">
-    <img class="hero-avatar" src="/images/avatar/shelby.jpg" alt="史帙头像">
+    <img class="hero-avatar" src="{{.Config.Profile.Author.Avatar}}" alt="{{.Config.Profile.Author.Name}}">
   </div>
 
   <div class="hero-content">
     <div class="hero-identity">
       <h1 class="hero-name">
-        <span class="hero-name-cn">史帙</span>
-        <span class="hero-name-en">Daybook</span>
+        <span class="hero-name-cn{{if .Config.Profile.Author.SignatureImage}} has-signature-image{{end}}" {{if .Config.Profile.Author.SignatureImage}}style="--signature-url: url('{{.Config.Profile.Author.SignatureImage}}');"{{end}}>{{.Config.Profile.Author.Name}}</span>
+        <span class="hero-name-en">{{.Config.Profile.Author.NameEn}}</span>
       </h1>
 
-      <p class="hero-slogan">{{T .Lang "home.slogan"}}</p>
+      <p class="hero-slogan">{{.Config.Profile.GetSlogan .Lang}}</p>
     </div>
 
     {{template "social_links" .}}

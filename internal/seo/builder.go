@@ -86,9 +86,9 @@ func BuildForHome(args BuilderArgs) SEOData {
 		Person{
 			Type:          "Person",
 			ID:            absURL(args.Config, "/#person"),
-			Name:          "史帙",
-			AlternateName: "Stat Indet",
-			URL:           absURL(args.Config, "/about/"),
+			Name:          args.Config.Profile.Author.Name,
+			AlternateName: args.Config.Profile.Author.NameEn,
+			URL:           absURL(args.Config, args.Config.Profile.Author.AboutUrl),
 		},
 		WebSite{
 			Type:        "WebSite",
