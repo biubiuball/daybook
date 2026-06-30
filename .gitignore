@@ -59,3 +59,5 @@ node_modules/
 !/readme.md
 
 tools/font-subsets/source/
+
+.obsidian/
