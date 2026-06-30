@@ -212,19 +212,45 @@ DAYBOOK_STATS_API_BASE=/api
 
 > **注意 (D1 统计)**: 本项目通过 Cloudflare Pages Functions 实现了无后端访问统计。如果你开启了统计，请在 Dashboard 的 `Settings → Functions` 中绑定 D1 数据库，名称设为 `DB`，并在环境变量中增加 `STATS_SALT` 作为防刷盐值。
 
-### 本地开发配置
+### 本地开发与隐私变量配置
 
-在本地开发时，你可以将仓库中的 `.env.example` 复制一份并重命名为 `.env`，填入你的个人配置。
+Daybook 遵循“代码与配置分离”的最佳实践。**请绝对不要将任何真实 API 链接或密码硬编码在代码中**。
 
-启动开发服务器时，使用项目自带的脚本，它会自动加载 `.env` 变量：
+在本地开发时，请复制一份仓库自带的模板文件：
 
 ```bash
-# 赋予执行权限（首次）
-chmod +x scripts/*.sh
-
-# 启动本地实时预览
-./scripts/serve.sh
+cp .env.example .env
 ```
+
+然后打开 `.env` 文件，填入你的个人配置。这个文件已经被 `.gitignore` 忽略，绝不会被提交到开源仓库中。
+
+本地启动服务器时，只需使用标准的 `npm` 命令即可，项目底层的脚本会自动读取 `.env` 并在构建时注入这些变量：
+
+```bash
+# 启动本地实时预览
+npm run serve
+```
+
+---
+
+## 个性化定制 (Customization)
+
+当你克隆本仓库作为自己的博客后，你可以通过修改 **`data/profile.json`** 来一键替换全站的个人标识与搜索引擎优化 (SEO) 描述。无需在代码里到处寻找需要修改的名字。
+
+打开 `data/profile.json`，它的结构如下：
+
+* **`author`**: 
+  * `name`: 你的中文昵称（将显示在左侧边栏、移动端抽屉栏以及首页作者区）。
+  * `nameEn`: 你的英文名（主要用于英文界面的替代显示）。
+  * `avatar`: 你的头像路径，存放在 `static/images/avatar/` 下。
+  * `signatureImage`: 首页显示的个人签名图片路径。
+* **`slogan`**:
+  * `zh` / `en`: 分别对应中英文界面下的座右铭，支持多语言独立配置。
+* **`seo`**:
+  * `homeTitle`: 浏览器标签页标题及搜索引擎索引标题。
+  * `homeDescription`: 网站的 Meta Description 介绍，对搜素引擎和社交媒体卡片预览至关重要。
+
+修改保存后，直接执行 `npm run build` 或 `npm run serve`，你的个人信息就会自动生效并更新到所有页面。
 
 ---
 
